@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Aws on Manis</title>
+    <link>blair55.github.io/tags/aws/</link>
+    <description>Recent content in Aws on Manis</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
+    <lastBuildDate>Fri, 12 Oct 2018 16:35:01 +0100</lastBuildDate>
+    
+	<atom:link href="blair55.github.io/tags/aws/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Scripting with AWS Parameter Store</title>
+      <link>blair55.github.io/blog/aws-parameter-store-scripting/</link>
+      <pubDate>Fri, 12 Oct 2018 16:35:01 +0100</pubDate>
+      
+      <guid>blair55.github.io/blog/aws-parameter-store-scripting/</guid>
+      <description>Ever need to write a short script as part of development to get feedback on a portion of code? Ever need to add private authentication values to that script? Ever wanted to add the script to source control but couldn&amp;rsquo;t because it contained your private authentication?
+ Enter: AWS Parameter Store.
+ This AWS service acts as a key-value store. Add your private settings such as usernames, passwords, connection strings etc and they can be retrieved programatically by their key name.</description>
+    </item>
+    
+  </channel>
+</rss>

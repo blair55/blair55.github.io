@@ -2,7 +2,12 @@
 title: "Scripting with AWS Parameter Store" 
 date: 2018-10-12T16:35:01+01:00
 draft: false
-tags: aws, parameter-store, bash, fsharp, jq
+tags:
+    - aws
+    - parameter-store
+    - bash
+    - fsharp
+    - jq
 ---
 
 Ever need to write a short script as part of development to get feedback on a portion of code? Ever need to add private authentication values to that script? Ever wanted to add the script to source control but couldn't because it contained your private authentication?
