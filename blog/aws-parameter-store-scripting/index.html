@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="generator" content="Hugo 0.49.2" />
+		<title>Scripting with AWS Parameter Store - Tech Nick</title>
+
+		<meta name="description" content="Ever need to write a short script as part of development to get feedback on a portion of code? Ever need to add private authentication values to that script? Ever wanted to add the script to source control but couldn&rsquo;t because it contained your private authentication?
+ Enter: AWS Parameter Store.
+ This AWS service acts as a key-value store. Add your private settings such as usernames, passwords, connection strings etc and they can be retrieved programatically by their key name.">
+
+
+		
+		
+		
+		<link rel="stylesheet" href="/css/ui.min.css"/>
+		
+		
+		
+
+		<link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono|Lato|Raleway">
+
+		
+
+		<style>
+	a { color: #ff8181; }
+	blockquote {
+		border-left-color: #ff8181;
+		border-right-color: #ff8181; }
+	.bar a:hover {
+		color: #ff8181;
+		text-decoration: none; }
+	.sep {
+		margin-top: 2rem;
+		margin-bottom: 1rem;
+		margin-left:0;
+		width: 24rem;
+		border-top: 2px solid #ff8181; }
+</style>
+
+	</head>
+
+<body>
+<header class="container no-print">
+	<div class="u-header">
+		<nav class="bar">
+	<ul><li>
+			<a href="/">
+				<img class="icon-text" src="/img/prev.svg"/>
+			</a>
+		</li></ul>
+</nav>
+
+	</div>
+</header>
+<main class="container">
+
+<article>
+	<header><hgroup id="brand">
+	<h1>Scripting with AWS Parameter Store</h1>
+	<h5>
+		
+		<time datetime="2018-10-12 16:35:01 &#43;0100 BST">Oct 12, 2018</time>
+		<span class="no-print">
+			-
+				
+				<a href="/tags/aws">aws</a>
+				
+				<a href="/tags/parameter-store">parameter-store</a>
+				
+				<a href="/tags/bash">bash</a>
+				
+				<a href="/tags/fsharp">fsharp</a>
+				
+				<a href="/tags/jq">jq</a>
+				<span>
+	</h5>
+	
+</hgroup>
+<hr class="sep" />
+</header>
+	
+
+<p>Ever need to write a short script as part of development to get feedback on a portion of code? Ever need to add private authentication values to that script? Ever wanted to add the script to source control but couldn&rsquo;t because it contained your private authentication?</p>
+
+<blockquote>
+<p>Enter: AWS Parameter Store.</p>
+</blockquote>
+
+<p>This AWS service acts as a key-value store. Add your private settings such as usernames, passwords, connection strings etc and they can be retrieved programatically by their key name. This lets you commit your handy script to source control by keeping it free from private values.</p>
+
+<h2 id="example">Example</h2>
+
+<blockquote>
+<p>Required: Your own AWS Account and the <a href="https://docs.aws.amazon.com/cli/latest/reference/ssm">AWS CLI</a> installed and configured. Make sure the aws output type configuration is json.
+Required: <a href="https://stedolan.github.io/jq/manual/">jq</a> cli</p>
+</blockquote>
+
+<p>Add a parameter to the store using the AWS CLI</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ aws ssm put-parameter --name <span class="s2">&#34;authtoken&#34;</span> --type <span class="s2">&#34;String&#34;</span> --value <span class="s2">&#34;foobar&#34;</span></code></pre></div>
+<p>Query the parameter store with the key name</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ aws ssm get-parameter --name <span class="s2">&#34;authtoken&#34;</span>
+&gt; <span class="o">{</span>
+    <span class="s2">&#34;Parameter&#34;</span>: <span class="o">{</span>
+        <span class="s2">&#34;Version&#34;</span>: <span class="m">1</span>,
+        <span class="s2">&#34;Type&#34;</span>: <span class="s2">&#34;String&#34;</span>,
+        <span class="s2">&#34;Name&#34;</span>: <span class="s2">&#34;authtoken&#34;</span>,
+        <span class="s2">&#34;Value&#34;</span>: <span class="s2">&#34;foobar&#34;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre></div>
+<p>Notice the output is in json format. To isolate the parameter value we can pipe the response into a jq expression:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ aws ssm put-parameter --name <span class="s2">&#34;authtoken&#34;</span> --type <span class="s2">&#34;String&#34;</span> --value <span class="s2">&#34;foobar&#34;</span> <span class="p">|</span> jq -r .Parameter.Value
+&gt; foobar</code></pre></div>
+<p>Armed with this command we can create a script that is absent of hard-coded private values.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">get_param<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">P</span><span class="o">=</span><span class="k">$(</span>aws ssm get-parameter --name <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.Parameter.Value&#39;</span><span class="k">)</span>
+    <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$P</span><span class="s2">&#34;</span>
+<span class="o">}</span>
+
+<span class="nv">AUTH_TOKEN</span><span class="o">=</span><span class="k">$(</span>get_param <span class="s2">&#34;authtoken&#34;</span><span class="k">)</span>
+<span class="nb">echo</span> AUTH_TOKEN</code></pre></div>
+<h2 id="taking-it-further">Taking it Further</h2>
+
+<p>Ever needed to write a script using a general purpose language?</p>
+
+<p>In a recent example, I needed to execute a script written in F#. The script required private values from the parameter store.</p>
+
+<p>I simply extended the original script to populate environment variables followed by a call to invoke the F# script.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">get_param<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">P</span><span class="o">=</span><span class="k">$(</span>aws ssm get-parameter --name <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.Parameter.Value&#39;</span><span class="k">)</span>
+    <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$P</span><span class="s2">&#34;</span>
+<span class="o">}</span>
+
+<span class="nv">AUTH_TOKEN</span><span class="o">=</span><span class="k">$(</span>get_param <span class="s2">&#34;authtoken&#34;</span><span class="k">)</span> <span class="se">\
+</span><span class="se"></span><span class="nv">BASE_URL</span><span class="o">=</span><span class="k">$(</span>get_param <span class="s2">&#34;baseurl&#34;</span><span class="k">)</span> <span class="se">\
+</span><span class="se"></span>fsharpi script.fsx</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">let</span> <span class="nv">env</span> <span class="o">=</span>
+    <span class="nn">System</span><span class="p">.</span><span class="nn">Environment</span><span class="p">.</span><span class="n">GetEnvironmentVariable</span>
+
+<span class="k">let</span> <span class="nv">log</span> <span class="o">=</span>
+    <span class="n">printfn</span> <span class="s">&#34;%s&#34;</span>
+
+<span class="n">env</span> <span class="s">&#34;AUTH_TOKEN&#34;</span> <span class="o">|&gt;</span> <span class="n">log</span>
+<span class="n">env</span> <span class="s">&#34;BASE_URL&#34;</span> <span class="o">|&gt;</span> <span class="n">log</span></code></pre></div>
+<h2 id="path-support">Path Support</h2>
+
+<p>Ever needed to get a collection of parameters?</p>
+
+<p>AWS Parameter Store key names can be provided as a path. This allows you to group parameters logically, for example by system or environment, or both.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ aws ssm put-parameter --name <span class="s2">&#34;/production/authtoken&#34;</span> --type <span class="s2">&#34;String&#34;</span> --value <span class="s2">&#34;foobar&#34;</span>
+$ aws ssm put-parameter --name <span class="s2">&#34;/production/baseurl&#34;</span> --type <span class="s2">&#34;String&#34;</span> --value <span class="s2">&#34;www.example.url&#34;</span></code></pre></div>
+<p>Parameters can then be fetched by path. Meaning your production system can retrieve all the keys under the production path.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ aws ssm get-parameters-by-path --path <span class="s2">&#34;/production&#34;</span>
+&gt; <span class="o">{</span>
+    <span class="s2">&#34;Parameters&#34;</span>: <span class="o">[</span>
+        <span class="o">{</span>
+            <span class="s2">&#34;Version&#34;</span>: <span class="m">1</span>,
+            <span class="s2">&#34;Type&#34;</span>: <span class="s2">&#34;String&#34;</span>,
+            <span class="s2">&#34;Name&#34;</span>: <span class="s2">&#34;/production/authtoken&#34;</span>,
+            <span class="s2">&#34;Value&#34;</span>: <span class="s2">&#34;foobar&#34;</span>
+        <span class="o">}</span>,
+        <span class="o">{</span>
+            <span class="s2">&#34;Version&#34;</span>: <span class="m">1</span>,
+            <span class="s2">&#34;Type&#34;</span>: <span class="s2">&#34;String&#34;</span>,
+            <span class="s2">&#34;Name&#34;</span>: <span class="s2">&#34;/production/baseurl&#34;</span>,
+            <span class="s2">&#34;Value&#34;</span>: <span class="s2">&#34;www.example.url&#34;</span>
+        <span class="o">}</span>
+    <span class="o">]</span>
+<span class="o">}</span></code></pre></div>
+<p>Note the output is a collection of parameters.</p>
+
+</article>
+<nav class="no-print post-nav">
+
+
+</nav>
+
+
+
+
+	<div id="disqus_thread" class="no-print"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = '';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+			<hr class="sep" />
+		</main>
+		<footer class="container no-print">
+			<div class="u-footer">
+				
+
+<a href="https://github.com/blair55"><img class="icon-social" src="/img/github.svg" alt="Github"/></a>
+
+
+<a href="https://twitter.com/nickblair"><img class="icon-social" src="/img/twitter.svg" alt="Twitter"/></a>
+
+<a href="https://blair55.github.io/index.xml" target="_blank"><img class="icon-social" src="/img/feed.svg" alt="Feed"></a>
+
+				<p>
+					
+					Theme used: <a href="https://github.com/yursan9/manis-hugo-theme">Manis</a><br>
+					
+					
+					&copy; 2018 Nicholas Blair
+					
+					
+					| <a href="/about/license">License</a>
+					
+				</p>
+				
+				<a href="#brand">
+					<img class="icon-text" src="/img/toup.svg" alt="To Up"/>
+					<span>Back to Up</span>
+				</a>
+				
+			</div>
+		</footer>
+		
+	</body>
+</html>
+

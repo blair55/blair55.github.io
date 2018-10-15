@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Tech Nick</title>
+    <link>https://blair55.github.io/tags/</link>
+    <description>Recent content in Tags on Tech Nick</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
+    <lastBuildDate>Fri, 12 Oct 2018 16:35:01 +0100</lastBuildDate>
+    
+	<atom:link href="https://blair55.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Aws</title>
+      <link>https://blair55.github.io/tags/aws/</link>
+      <pubDate>Fri, 12 Oct 2018 16:35:01 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/aws/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Bash</title>
+      <link>https://blair55.github.io/tags/bash/</link>
+      <pubDate>Fri, 12 Oct 2018 16:35:01 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/bash/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Fsharp</title>
+      <link>https://blair55.github.io/tags/fsharp/</link>
+      <pubDate>Fri, 12 Oct 2018 16:35:01 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/fsharp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Jq</title>
+      <link>https://blair55.github.io/tags/jq/</link>
+      <pubDate>Fri, 12 Oct 2018 16:35:01 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/jq/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Parameter Store</title>
+      <link>https://blair55.github.io/tags/parameter-store/</link>
+      <pubDate>Fri, 12 Oct 2018 16:35:01 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/parameter-store/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
