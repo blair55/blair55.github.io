@@ -37,6 +37,12 @@
   </url>
   
   <url>
+    <loc>https://blair55.github.io/tags/git/</loc>
+    <lastmod>2018-10-16T10:36:05+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://blair55.github.io/tags/jq/</loc>
     <lastmod>2018-10-12T16:35:01+01:00</lastmod>
     <priority>0</priority>
@@ -56,6 +62,12 @@
   
   <url>
     <loc>https://blair55.github.io/</loc>
+    <lastmod>2018-10-16T10:36:05+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/zsh/</loc>
     <lastmod>2018-10-16T10:36:05+01:00</lastmod>
     <priority>0</priority>
   </url>

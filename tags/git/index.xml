@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Git on Tech Nick</title>
+    <link>https://blair55.github.io/tags/git/</link>
+    <description>Recent content in Git on Tech Nick</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
+    <lastBuildDate>Tue, 16 Oct 2018 10:36:05 +0100</lastBuildDate>
+    
+	<atom:link href="https://blair55.github.io/tags/git/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Squash Git Commits</title>
+      <link>https://blair55.github.io/blog/squash-git-commits/</link>
+      <pubDate>Tue, 16 Oct 2018 10:36:05 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/blog/squash-git-commits/</guid>
+      <description>Ever made several commits on a feature branch and needed to rebase? Rebasing multiple commits can be tedious if there is a conflict from an early commit, requiring a commit resolution in every commit that follows. It can be practical, therefore, to squash multiple commits into a single commit before rebasing.
+Ever wanted to clean up your commit history before pushing? I often make quick commits if I&amp;rsquo;m required to switch branches, or spiking an idea during development that ends up being permanent.</description>
+    </item>
+    
+  </channel>
+</rss>
