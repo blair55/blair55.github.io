@@ -83,7 +83,9 @@ This two-step package/deploy process is very familiar, so I was lured into using
 
 <p>The severless framework <a href="https://serverless.com/framework/docs/providers/aws/guide/packaging/">package command</a> claims to be useful in CI/CD workflows. The command produces cloud formation stacks json files on disk that can be bundled and considered the &lsquo;deployment artifacts&rsquo; at the end of the pipeline. These artifacts can be provided to the <code>serverless deploy</code> command that could be run at a later date.</p>
 
-<p>This two-step package/deploy process is very familiar, so I was lured into using the <code>serverless package</code> command. However, there is a major flaw that in the design. The behaviour of the package command is to &lsquo;bake in&rsquo; the value of the expected environment variables or <a href="https://aws.amazon.com/systems-manager/features/#Parameter_Store">AWS Parameter Store</a> keys. This means your artifacts are not environment-agnostic. For example, if you include the stage parameter in the name of any functions or resources then the value of the stage parameter will be hardcoded in the artifacts. You therefore cannot promote these artifacts to any stage other than the one named when <code>serverless package</code> was called.</p>
+<p>This two-step package/deploy process is very familiar, so I was lured into using the <code>serverless package</code> command. However, there is a major flaw in the design!</p>
+
+<p>The behaviour of the command is to &lsquo;bake in&rsquo; the value of the expected environment variables or <a href="https://aws.amazon.com/systems-manager/features/#Parameter_Store">AWS Parameter Store</a> keys. This means your artifacts are not environment-agnostic. For example, if you include the stage parameter in the name of any functions or resources then the value of the stage parameter will be hardcoded in the artifacts. You therefore cannot promote these artifacts to any stage other than the one named when <code>serverless package</code> was called.</p>
 
 <h2 id="environment-agnostic">Environment Agnostic</h2>
 
