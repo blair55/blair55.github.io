@@ -6,10 +6,20 @@
     <description>Recent content in Blog on Tech Nick</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
-    <lastBuildDate>Tue, 16 Oct 2018 10:36:05 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 01 Apr 2019 11:36:05 +0100</lastBuildDate>
     
 	<atom:link href="https://blair55.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Serverless package done right</title>
+      <link>https://blair55.github.io/blog/serverless-package-done-right/</link>
+      <pubDate>Mon, 01 Apr 2019 11:36:05 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/blog/serverless-package-done-right/</guid>
+      <description>Problem The severless framework package command claims to be useful in CI/CD workflows. The command produces cloud formation stacks json files on disk that can be bundled and considered the &amp;lsquo;deployment artifacts&amp;rsquo; at the end of the pipeline. These artifacts can be provided to the serverless deploy command that could be run at a later date.
+This two-step package/deploy process is very familiar, so I was lured into using the serverless package command.</description>
+    </item>
     
     <item>
       <title>Squash Git Commits</title>
