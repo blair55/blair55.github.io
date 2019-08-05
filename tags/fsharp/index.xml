@@ -6,10 +6,24 @@
     <description>Recent content in Fsharp on Tech Nick</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
-    <lastBuildDate>Fri, 12 Oct 2018 16:35:01 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 02 Aug 2019 11:36:05 +0100</lastBuildDate>
     
 	<atom:link href="https://blair55.github.io/tags/fsharp/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Combining monads</title>
+      <link>https://blair55.github.io/blog/combining-monads/</link>
+      <pubDate>Fri, 02 Aug 2019 11:36:05 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/blog/combining-monads/</guid>
+      <description>The F# Result&amp;lt;&#39;a,&#39;b&amp;gt; type allows for concise control flow syntax.
+The async { ... } computation expression similarly minimizes the noise of asynchrony.
+Throw in the Writer monad for logging minus the intrinsic IO statements.
+How do you get the benefits of all three together? You need to combine&amp;hellip;
+ Source code gist.
+ Writer The Result and Async types are core types in F# but Writer is not so we need a bit of boilerplate to get going.</description>
+    </item>
     
     <item>
       <title>Scripting with AWS Parameter Store</title>
