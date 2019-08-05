@@ -17,10 +17,7 @@
       <pubDate>Fri, 02 Aug 2019 11:36:05 +0100</pubDate>
       
       <guid>https://blair55.github.io/blog/combining-monads/</guid>
-      <description>The F# Result&amp;lt;&#39;a,&#39;b&amp;gt; type allows for concise control flow syntax.
-The async { ... } computation expression similarly minimizes the noise of asynchrony.
-Throw in the Writer monad for logging minus the intrinsic IO statements.
-How do you get the benefits of all three together? You need to combine&amp;hellip;
+      <description>The F# Result&amp;lt;&#39;a,&#39;b&amp;gt; type allows for concise control flow syntax. The async { ... } computation expression similarly minimizes the noise of asynchrony. Throw in the Writer monad for logging minus the intrinsic IO statements. How do you get the benefits of all three together? You need to combine&amp;hellip;
  Source code gist.
  Writer The Result and Async types are core types in F# but Writer is not so we need a bit of boilerplate to get going.</description>
     </item>

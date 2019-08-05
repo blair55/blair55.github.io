@@ -6,10 +6,7 @@
 		<meta name="generator" content="Hugo 0.49.2" />
 		<title>Combining monads - Tech Nick</title>
 
-		<meta name="description" content="The F# Result&lt;&#39;a,&#39;b&gt; type allows for concise control flow syntax.
-The async { ... } computation expression similarly minimizes the noise of asynchrony.
-Throw in the Writer monad for logging minus the intrinsic IO statements.
-How do you get the benefits of all three together? You need to combine&hellip;
+		<meta name="description" content="The F# Result&lt;&#39;a,&#39;b&gt; type allows for concise control flow syntax. The async { ... } computation expression similarly minimizes the noise of asynchrony. Throw in the Writer monad for logging minus the intrinsic IO statements. How do you get the benefits of all three together? You need to combine&hellip;
  Source code gist.
  Writer The Result and Async types are core types in F# but Writer is not so we need a bit of boilerplate to get going.">
 
@@ -81,13 +78,7 @@ How do you get the benefits of all three together? You need to combine&hellip;
 </header>
 	
 
-<p>The F# <code>Result&lt;'a,'b&gt;</code> type allows for concise control flow syntax.</p>
-
-<p>The <code>async { ... }</code> computation expression similarly minimizes the noise of asynchrony.</p>
-
-<p>Throw in the <code>Writer</code> monad for logging minus the intrinsic IO statements.</p>
-
-<p>How do you get the benefits of all three together? You need to combine&hellip;</p>
+<p>The F# <code>Result&lt;'a,'b&gt;</code> type allows for concise control flow syntax. The <code>async { ... }</code> computation expression similarly minimizes the noise of asynchrony. Throw in the <code>Writer</code> monad for logging minus the intrinsic IO statements. How do you get the benefits of all three together? You need to combine&hellip;</p>
 
 <blockquote>
 <p>Source code <a href="https://gist.github.com/blair55/ed415eb479d639f471418f482545fa0e">gist</a>.</p>
@@ -96,16 +87,13 @@ How do you get the benefits of all three together? You need to combine&hellip;
 <h2 id="writer">Writer</h2>
 
 <p>The <code>Result</code> and <code>Async</code> types are core types in F# but <code>Writer</code> is not so we need a bit of boilerplate to get going. We define a single case union type in which the single case is parameterized with a function. The function expects a unit and returns a tuple. See <a href="http://codebetter.com/matthewpodwysocki/2010/02/02/a-kick-in-the-monads-writer-edition/">this post</a> for details.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">type</span> <span class="nc">Writer</span><span class="o">&lt;</span><span class="k">&#39;</span><span class="n">w</span><span class="o">,</span> <span class="k">&#39;</span><span class="n">t</span><span class="o">&gt;</span> <span class="o">=</span>
+  <span class="n">Writer</span> <span class="k">of</span> <span class="o">(</span><span class="kt">unit</span> <span class="o">-&gt;</span> <span class="k">&#39;</span><span class="n">t</span> <span class="o">*</span> <span class="k">&#39;</span><span class="n">w</span><span class="o">)</span>
 
-<pre><code>type Writer&lt;'w, 't&gt; =
-  Writer of (unit -&gt; 't * 'w)
+<span class="k">module</span> <span class="nn">Writer</span> <span class="o">=</span>
 
-module Writer =
-
-  let run&lt;'w,'t&gt; (Writer w) : ('t * 'w) =
-    w ()
-</code></pre>
-
+  <span class="k">let</span> <span class="nv">run</span><span class="o">&lt;</span><span class="k">&#39;</span><span class="n">w</span><span class="o">,</span><span class="k">&#39;</span><span class="n">t</span><span class="o">&gt;</span> <span class="o">(</span><span class="n">Writer</span> <span class="n">w</span><span class="o">)</span> <span class="o">:</span> <span class="o">(</span><span class="k">&#39;</span><span class="n">t</span> <span class="o">*</span> <span class="k">&#39;</span><span class="n">w</span><span class="o">)</span> <span class="o">=</span>
+    <span class="n">w</span> <span class="bp">()</span></code></pre></div>
 <h2 id="bind">Bind</h2>
 
 <p>Now, lets cover the <code>bind</code> function for each type.</p>
