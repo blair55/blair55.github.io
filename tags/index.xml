@@ -30,11 +30,29 @@
     </item>
     
     <item>
+      <title>F#</title>
+      <link>https://blair55.github.io/tags/f/</link>
+      <pubDate>Fri, 02 Aug 2019 11:36:05 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/f/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Fsharp</title>
       <link>https://blair55.github.io/tags/fsharp/</link>
       <pubDate>Fri, 12 Oct 2018 16:35:01 +0100</pubDate>
       
       <guid>https://blair55.github.io/tags/fsharp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Functional</title>
+      <link>https://blair55.github.io/tags/functional/</link>
+      <pubDate>Fri, 02 Aug 2019 11:36:05 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/functional/</guid>
       <description></description>
     </item>
     
@@ -53,6 +71,15 @@
       <pubDate>Fri, 12 Oct 2018 16:35:01 +0100</pubDate>
       
       <guid>https://blair55.github.io/tags/jq/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Monads</title>
+      <link>https://blair55.github.io/tags/monads/</link>
+      <pubDate>Fri, 02 Aug 2019 11:36:05 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/monads/</guid>
       <description></description>
     </item>
     

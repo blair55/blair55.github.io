@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://blair55.github.io/blog/combining-monads/</loc>
+    <lastmod>2019-08-02T11:36:05+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://blair55.github.io/blog/serverless-package-done-right/</loc>
     <lastmod>2019-04-01T11:36:05+01:00</lastmod>
   </url>
@@ -31,13 +36,25 @@
   
   <url>
     <loc>https://blair55.github.io/blog/</loc>
-    <lastmod>2019-04-01T11:36:05+01:00</lastmod>
+    <lastmod>2019-08-02T11:36:05+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/f/</loc>
+    <lastmod>2019-08-02T11:36:05+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://blair55.github.io/tags/fsharp/</loc>
     <lastmod>2018-10-12T16:35:01+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/functional/</loc>
+    <lastmod>2019-08-02T11:36:05+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -50,6 +67,12 @@
   <url>
     <loc>https://blair55.github.io/tags/jq/</loc>
     <lastmod>2018-10-12T16:35:01+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/monads/</loc>
+    <lastmod>2019-08-02T11:36:05+01:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -73,7 +96,7 @@
   
   <url>
     <loc>https://blair55.github.io/</loc>
-    <lastmod>2019-04-01T11:36:05+01:00</lastmod>
+    <lastmod>2019-08-02T11:36:05+01:00</lastmod>
     <priority>0</priority>
   </url>
   
