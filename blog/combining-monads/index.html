@@ -245,9 +245,11 @@ val it : Result&lt;string,string&gt; * string list =
 
 <h2 id="discussion">Discussion</h2>
 
-<p>The <code>WriterResult</code> and <code>AsyncWriterResult</code> types implicitly return on the <a href="https://fsharpforfunandprofit.com/posts/recipe-part2/">error track</a> when an <code>Error</code> case is encountered. But what if you want to log after even after an error?</p>
+<p>The <code>WriterResult</code> and <code>AsyncWriterResult</code> types implicitly return on the <a href="https://fsharpforfunandprofit.com/posts/recipe-part2/">error track</a> when an <code>Error</code> case is encountered meaning any <code>do!</code> log will not be evaluated after any <code>let!</code> that returns an <code>Error</code>. As demonstrated above. But what if you <em>do</em> want to log after receiving an <code>Error</code>?</p>
 
-<p>The <code>measure</code> function below lets you time a function call that returns a <code>AsyncWriterResult</code>. Having unwrapped the outer <code>Async</code> type by invoking the function with a <code>unit</code> we have a <code>WriterResult</code>. We run this to get at our inner <code>Result</code> and any logs written. We don&rsquo;t care which case our <code>Result</code> is because we want to write the elapsed time in either case. We can just bundle up our <code>Result</code> with concatenated logs in a new <code>Writer</code> and using <code>return!</code> because we have a fully formed <code>AsyncWriterResult</code> by the end of the statement.</p>
+<p>Lets say we want to log the duration of a function call that returns a <code>AsyncWriterResult</code>. We can only know the elapsed time after the function has completed. However, if the function results in an <code>Error</code> we don&rsquo;t have the opportunity to stop the clock or write the log!</p>
+
+<p>The <code>measure</code> function below can help us out. By unwrapping the outer <code>Async</code> type by invoking the function with a <code>unit</code> we have a <code>WriterResult</code>. We run this to get at our inner <code>Result</code> and any logs written. We don&rsquo;t care which case our <code>Result</code> is because we want to write the elapsed time in either case. We can just bundle up our <code>Result</code> with the concatenated logs in a new <code>Writer</code> and using <code>return!</code> because we have a fully formed <code>AsyncWriterResult</code> already at the end of the expression.</p>
 <div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">let</span> <span class="nv">measure</span> <span class="n">name</span> <span class="n">f</span> <span class="o">=</span> <span class="n">asyncWriterResult</span> <span class="o">{</span>
   <span class="k">return</span><span class="o">!</span> <span class="n">async</span> <span class="o">{</span>
     <span class="k">let</span> <span class="nv">sw</span> <span class="o">=</span> <span class="nn">Stopwatch</span><span class="p">.</span><span class="n">StartNew</span> <span class="bp">()</span>
@@ -263,6 +265,7 @@ val it : Result&lt;string,string&gt; * string list =
 <span class="k">let</span> <span class="nv">expr</span> <span class="n">x</span> <span class="o">=</span> <span class="n">asyncWriterResult</span> <span class="o">{</span>
   <span class="k">do</span><span class="o">!</span> <span class="n">write</span> <span class="s">&#34;getting thing&#34;</span>
   <span class="k">let!</span> <span class="nv">thing</span> <span class="o">=</span> <span class="n">measure</span> <span class="s">&#34;elapsed&#34;</span> <span class="o">&lt;|</span> <span class="k">fun</span> <span class="bp">()</span> <span class="o">-&gt;</span> <span class="n">failToGetThing</span> <span class="n">x</span>
+  <span class="k">do</span><span class="o">!</span> <span class="n">write</span> <span class="s">&#34;returning thing&#34;</span>
   <span class="k">return</span> <span class="n">thing</span> <span class="o">}</span></code></pre></div>
 <p>Now the output includes the <code>elapsed</code> log despite resulting in an <code>Error</code>.</p>
 
