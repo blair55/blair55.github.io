@@ -6,8 +6,9 @@
 		<meta name="generator" content="Hugo 0.49.2" />
 		<title>A functional wrapper around the .net AWS DynamoDB SDK - Tech Nick</title>
 
-		<meta name="description" content="A tour of F# capabilities used to enforce the constraints of the DynamoDB client at compile time. We&rsquo;ll look at domain modeling with discriminated unions, data access using the reader applicative, and error handling with the result type.
-Data Types DynamoDB is a key-value &amp; document database. DynamoDB tables are schemaless so each record can contain a different number of attributes. A record attribute has a string name and a value that is one of three types: Scalar, Set, and Document.">
+		<meta name="description" content="We&rsquo;re going to take a tour of some F# capabilities and use them to enforce the constraints of the DynamoDB client. We&rsquo;ll look at domain modeling with discriminated unions, data access using the reader applicative, and error handling with the result type.
+DynamoDB and Data Types Before we get started, let&rsquo;s summarise DynamoDB and its supported types.
+ DynamoDB is a key-value &amp; document database. DynamoDB tables are schemaless so each record can contain a different number of attributes.">
 
 
 		
@@ -81,20 +82,25 @@ Data Types DynamoDB is a key-value &amp; document database. DynamoDB tables are 
 </header>
 	
 
-<p>A tour of F# capabilities used to enforce the constraints of the DynamoDB client at compile time.
+<p>We&rsquo;re going to take a tour of some F# capabilities and
+use them to enforce the constraints of the DynamoDB client.
 We&rsquo;ll look at domain modeling with discriminated unions,
 data access using the reader applicative,
 and error handling with the result type.</p>
 
-<h2 id="data-types">Data Types</h2>
+<h2 id="dynamodb-and-data-types">DynamoDB and Data Types</h2>
 
-<p>DynamoDB is a key-value &amp; document database.
-DynamoDB tables are schemaless so each record can contain a different number of attributes.
-A record attribute has a string name and a value that is one of three types:
-Scalar, Set, and Document.
-Below is a summary of the <a href="https://docs.aws.amazon.com/en_pv/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html">full data type documentation</a>.</p>
+<p>Before we get started, let&rsquo;s summarise DynamoDB and its <a href="https://docs.aws.amazon.com/en_pv/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html">supported types</a>.</p>
 
-<p>A <strong>Scalar</strong> is a single value of a particular primitive type:
+<ul>
+<li>DynamoDB is a key-value &amp; document database.</li>
+<li>DynamoDB tables are schemaless so each record can contain a different number of attributes.</li>
+<li>A record attribute has a string name and a value that is one of three types:
+Scalar, Set, and Document.</li>
+</ul>
+
+<p>Below is a summary
+A <strong>Scalar</strong> is a single value of a particular primitive type:
 string, number, boolean, binary or null.
 Number and binary values require string conversion before being sent over the network.</p>
 
@@ -382,7 +388,7 @@ that will plug into a parent reader expression.</p>
   <span class="o">{</span> <span class="n">Name</span> <span class="o">:</span> <span class="kt">string</span>
     <span class="n">Description</span> <span class="o">:</span> <span class="kt">string</span>
     <span class="n">IsVerified</span> <span class="o">:</span> <span class="kt">bool</span>
-    <span class="n">Merchant</span> <span class="o">:</span> <span class="n">Merhant</span> <span class="c1">// new field
+    <span class="n">Merchant</span> <span class="o">:</span> <span class="n">Merchant</span> <span class="c1">// new field
 </span><span class="c1"></span>    <span class="n">Quantity</span> <span class="o">:</span> <span class="n">int</span>
     <span class="n">Cost</span> <span class="o">:</span> <span class="kt">float</span> <span class="o">}</span>
 
@@ -405,8 +411,8 @@ that will plug into a parent reader expression.</p>
 <h3 id="result-reader">Result Reader</h3>
 
 <p>In our example, we are reading items from the <code>Dictionary</code> unsafely.
-Let&rsquo;s introduce the <code>Result</code> type to help us handle errors gracefully
-and better support for reading optional fields on our domain objects.</p>
+Let&rsquo;s introduce the <code>Result</code> type to help us handle errors more gracefully
+and provide better for support optional fields on our domain objects.</p>
 <div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">module</span> <span class="nn">ReaderResult</span> <span class="o">=</span>
 
   <span class="k">let</span> <span class="nv">retn</span> <span class="n">a</span> <span class="o">=</span>

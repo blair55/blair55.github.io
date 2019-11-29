@@ -17,8 +17,9 @@
       <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
       
       <guid>https://blair55.github.io/blog/dynamodb-functional-wrapper/</guid>
-      <description>A tour of F# capabilities used to enforce the constraints of the DynamoDB client at compile time. We&amp;rsquo;ll look at domain modeling with discriminated unions, data access using the reader applicative, and error handling with the result type.
-Data Types DynamoDB is a key-value &amp;amp; document database. DynamoDB tables are schemaless so each record can contain a different number of attributes. A record attribute has a string name and a value that is one of three types: Scalar, Set, and Document.</description>
+      <description>We&amp;rsquo;re going to take a tour of some F# capabilities and use them to enforce the constraints of the DynamoDB client. We&amp;rsquo;ll look at domain modeling with discriminated unions, data access using the reader applicative, and error handling with the result type.
+DynamoDB and Data Types Before we get started, let&amp;rsquo;s summarise DynamoDB and its supported types.
+ DynamoDB is a key-value &amp;amp; document database. DynamoDB tables are schemaless so each record can contain a different number of attributes.</description>
     </item>
     
   </channel>
