@@ -126,28 +126,28 @@ Below is an example record.</p>
 <p>This description of the data types is enough to start building a Write Model.
 <strong>We&rsquo;re going to build a layer between our code and the AWS SDK</strong>,
 so let&rsquo;s review the exposed API.</p>
-<div class="highlight"><pre class="chroma"><code class="language-$ paket add AWSSDK.DynamoDBv2```" data-lang="$ paket add AWSSDK.DynamoDBv2```">The DynamoDB client type exposes a `PutItemAsync` method for writing records to a table.
-This method takes two parameters, the target table name as a `string` and a `Dictonary&lt;string, AttributeValue&gt;` of attributes to write.
-The dictionary is what we&#39;re interested in building with our model.
-Here&#39;s an example of directly interfacing with the library to write an item.
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ paket add AWSSDK.DynamoDBv2</code></pre></div>
+<p>The <code>AmazonDynamoDBClient</code> type exposes a <code>PutItemAsync</code> method for
+writing records to a table.
+This method takes two parameters, the target table name as a <code>string</code> and a <code>Dictonary&lt;string, AttributeValue&gt;</code> of attributes to write.
+The dictionary is what we&rsquo;re interested in building with our model.
+Here&rsquo;s an example of directly interfacing with the library to write an item.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">open</span> <span class="nn">Amazon.DynamoDBv2</span>
+<span class="k">open</span> <span class="nn">Amazon.DynamoDBv2.Model</span>
+<span class="k">open</span> <span class="nn">System.Collections.Generic</span>
 
-```fsharp
-open Amazon.DynamoDBv2
-open Amazon.DynamoDBv2.Model
-open System.Collections.Generic
+<span class="k">use</span> <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AmazonDynamoDBClient</span> <span class="bp">()</span>
 
-use client = new AmazonDynamoDBClient ()
+<span class="k">let</span> <span class="nv">attributes</span> <span class="o">=</span>
+  <span class="o">[</span> <span class="s">&#34;name&#34;</span> <span class="o">,</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">S</span> <span class="o">=</span> <span class="s">&#34;foo&#34;</span><span class="o">)</span>
+    <span class="s">&#34;total&#34;</span><span class="o">,</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">N</span> <span class="o">=</span> <span class="s">&#34;123.45&#34;</span><span class="o">)</span>
+    <span class="s">&#34;raw&#34;</span>  <span class="o">,</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">B</span> <span class="o">=</span> <span class="s">&#34;encoded binary value&#34;</span><span class="o">)</span> <span class="o">]</span>
+  <span class="o">|&gt;</span> <span class="n">dict</span>
+  <span class="o">|&gt;</span> <span class="n">Dictionary</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">,</span><span class="n">AttributeValue</span><span class="o">&gt;</span>
 
-let attributes =
-  [ &#34;name&#34; , new AttributeValue (S = &#34;foo&#34;)
-    &#34;total&#34;, new AttributeValue (N = &#34;123.45&#34;)
-    &#34;raw&#34;  , new AttributeValue (B = &#34;encoded binary value&#34;) ]
-  |&gt; dict
-  |&gt; Dictionary&lt;string,AttributeValue&gt;
-
-let response =
-  new PutItemRequest (&#34;my_table_name&#34;, attributes)
-  |&gt; client.PutItemAsync</code></pre></div>
+<span class="k">let</span> <span class="nv">response</span> <span class="o">=</span>
+  <span class="k">new</span> <span class="n">PutItemRequest</span> <span class="o">(</span><span class="s">&#34;my_table_name&#34;</span><span class="o">,</span> <span class="n">attributes</span><span class="o">)</span>
+  <span class="o">|&gt;</span> <span class="n">client</span><span class="o">.</span><span class="n">PutItemAsync</span></code></pre></div>
 <p>The <code>AttributeValue</code> type has a corresponding constructor argument for each type.
 The arguments are optional, so it is possible to provide
 zero arguments or more than one argument when constructing.
@@ -511,7 +511,7 @@ doesn&rsquo;t exist.</p>
 There are plenty more features to model functionally,
 including paging, updating and filter expressions.
 If you need a feature-complete library then check out
-(FSharp.AWS.DynamoDB)[<a href="https://github.com/fsprojects/FSharp.AWS.DynamoDB">https://github.com/fsprojects/FSharp.AWS.DynamoDB</a>].</p>
+<a href="https://github.com/fsprojects/FSharp.AWS.DynamoDB">FSharp.AWS.DynamoDB</a>.</p>
 
 <p>This article mainly intends to show an example of domain modeling
 and the reader applicative, but the green-shoots of a more holistic
