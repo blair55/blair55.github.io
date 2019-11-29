@@ -6,7 +6,7 @@
     <description>Recent content in Tags on Tech Nick</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
-    <lastBuildDate>Mon, 01 Apr 2019 11:36:05 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 29 Nov 2019 10:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://blair55.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>Aws</title>
       <link>https://blair55.github.io/tags/aws/</link>
-      <pubDate>Mon, 01 Apr 2019 11:36:05 +0100</pubDate>
+      <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
       
       <guid>https://blair55.github.io/tags/aws/</guid>
       <description></description>
@@ -30,9 +30,18 @@
     </item>
     
     <item>
+      <title>Dynamodb</title>
+      <link>https://blair55.github.io/tags/dynamodb/</link>
+      <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://blair55.github.io/tags/dynamodb/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Fsharp</title>
       <link>https://blair55.github.io/tags/fsharp/</link>
-      <pubDate>Fri, 02 Aug 2019 11:36:05 +0100</pubDate>
+      <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
       
       <guid>https://blair55.github.io/tags/fsharp/</guid>
       <description></description>
@@ -41,7 +50,7 @@
     <item>
       <title>Functional</title>
       <link>https://blair55.github.io/tags/functional/</link>
-      <pubDate>Fri, 02 Aug 2019 11:36:05 +0100</pubDate>
+      <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
       
       <guid>https://blair55.github.io/tags/functional/</guid>
       <description></description>
@@ -68,7 +77,7 @@
     <item>
       <title>Monads</title>
       <link>https://blair55.github.io/tags/monads/</link>
-      <pubDate>Fri, 02 Aug 2019 11:36:05 +0100</pubDate>
+      <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
       
       <guid>https://blair55.github.io/tags/monads/</guid>
       <description></description>

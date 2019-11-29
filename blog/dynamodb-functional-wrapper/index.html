@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="generator" content="Hugo 0.49.2" />
+		<title>A functional wrapper around Dynamo DB - Tech Nick</title>
+
+		<meta name="description" content="A functional wrapper around the .net AWS DynamoDB SDK A tour of F# capabilities used to enforce the constraints of the DynamoDB client at compile time. We&rsquo;ll look at domain modeling with discriminated unions, data access using the reader applicative, and error handling with the result type.
+Data Types DynamoDB is a key-value &amp; document database. DynamoDB tables are schemaless so each record can contain a different number of attributes.">
+
+
+		
+		
+		
+		<link rel="stylesheet" href="/css/ui.min.css"/>
+		
+		
+		
+
+		<link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono|Lato|Raleway">
+
+		
+
+		<style>
+	a { color: #ff8181; }
+	blockquote {
+		border-left-color: #ff8181;
+		border-right-color: #ff8181; }
+	.bar a:hover {
+		color: #ff8181;
+		text-decoration: none; }
+	.sep {
+		margin-top: 2rem;
+		margin-bottom: 1rem;
+		margin-left:0;
+		width: 24rem;
+		border-top: 2px solid #ff8181; }
+</style>
+
+	</head>
+
+<body>
+<header class="container no-print">
+	<div class="u-header">
+		<nav class="bar">
+	<ul><li>
+			<a href="/">
+				<img class="icon-text" src="/img/prev.svg"/>
+			</a>
+		</li></ul>
+</nav>
+
+	</div>
+</header>
+<main class="container">
+
+<article>
+	<header><hgroup id="brand">
+	<h1>A functional wrapper around Dynamo DB</h1>
+	<h5>
+		
+		<time datetime="2019-11-29 10:00:00 &#43;0000 UTC">Nov 29, 2019</time>
+		<span class="no-print">
+			-
+				
+				<a href="/tags/fsharp">fsharp</a>
+				
+				<a href="/tags/functional">functional</a>
+				
+				<a href="/tags/monads">monads</a>
+				
+				<a href="/tags/aws">aws</a>
+				
+				<a href="/tags/dynamodb">dynamodb</a>
+				<span>
+	</h5>
+	
+</hgroup>
+<hr class="sep" />
+</header>
+	
+
+<h1 id="a-functional-wrapper-around-the-net-aws-dynamodb-sdk">A functional wrapper around the .net AWS DynamoDB SDK</h1>
+
+<p>A tour of F# capabilities used to enforce the constraints of the DynamoDB client at compile time.
+We&rsquo;ll look at domain modeling with discriminated unions,
+data access using the reader applicative,
+and error handling with the result type.</p>
+
+<h2 id="data-types">Data Types</h2>
+
+<p>DynamoDB is a key-value &amp; document database.
+DynamoDB tables are schemaless so each record can contain a different number of attributes.
+A record attribute has a string name and a value that is one of three types:
+Scalar, Set, and Document.
+Below is a summary of the <a href="https://docs.aws.amazon.com/en_pv/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html">full data type documentation</a>.</p>
+
+<p>A <strong>Scalar</strong> is a single value of a particular primitive type:
+string, number, boolean, binary or null.
+Number and binary values require string conversion before being sent over the network.</p>
+
+<p>A <strong>Set</strong> is a collection of distinct items of the same type.
+The set types are string, number, and binary. A set cannot be empty.</p>
+
+<p>A <strong>Document</strong> is made from lists and maps.
+Lists are non-distinct collections of non-uniform type.
+Maps are just like name-value pair json objects and naturally support nesting.
+Maps and lists are rich objects because they are compositions of the scalar data types.
+Below is an example record.</p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="err">Day:</span> <span class="nt">&#34;Monday&#34;</span><span class="p">,</span>
+  <span class="err">UnreadEmails:</span> <span class="err">42,</span>
+  <span class="err">ItemsOnMyDesk:</span> <span class="err">[</span>
+    <span class="nt">&#34;Coffee Cup&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;Telephone&#34;</span><span class="p">,</span>
+    <span class="err">{</span>
+      <span class="err">Pens:</span> <span class="err">{</span> <span class="err">Quantity</span> <span class="err">:</span> <span class="err">3</span> <span class="p">}</span><span class="err">,</span>
+      <span class="err">Pencils:</span> <span class="p">{</span> <span class="err">Quantity</span> <span class="err">:</span> <span class="err">2</span><span class="p">}</span><span class="err">,</span>
+      <span class="err">Erasers:</span> <span class="p">{</span> <span class="err">Quantity</span> <span class="err">:</span> <span class="err">1</span><span class="p">}</span>
+    <span class="err">}</span>
+  <span class="err">]</span>
+<span class="err">}</span></code></pre></div>
+<h2 id="the-write-model">The Write Model</h2>
+
+<p>This description of the data types is enough to start building a Write Model.
+<strong>We&rsquo;re going to build a layer between our code and the AWS SDK</strong>,
+so let&rsquo;s review the exposed API.</p>
+<div class="highlight"><pre class="chroma"><code class="language-$ paket add AWSSDK.DynamoDBv2```" data-lang="$ paket add AWSSDK.DynamoDBv2```">The DynamoDB client type exposes a `PutItemAsync` method for writing records to a table.
+This method takes two parameters, the target table name as a `string` and a `Dictonary&lt;string, AttributeValue&gt;` of attributes to write.
+The dictionary is what we&#39;re interested in building with our model.
+Here&#39;s an example of directly interfacing with the library to write an item.
+
+```fsharp
+open Amazon.DynamoDBv2
+open Amazon.DynamoDBv2.Model
+open System.Collections.Generic
+
+use client = new AmazonDynamoDBClient ()
+
+let attributes =
+  [ &#34;name&#34; , new AttributeValue (S = &#34;foo&#34;)
+    &#34;total&#34;, new AttributeValue (N = &#34;123.45&#34;)
+    &#34;raw&#34;  , new AttributeValue (B = &#34;encoded binary value&#34;) ]
+  |&gt; dict
+  |&gt; Dictionary&lt;string,AttributeValue&gt;
+
+let response =
+  new PutItemRequest (&#34;my_table_name&#34;, attributes)
+  |&gt; client.PutItemAsync</code></pre></div>
+<p>The <code>AttributeValue</code> type has a corresponding constructor argument for each type.
+The arguments are optional, so it is possible to provide
+zero arguments or more than one argument when constructing.
+We can improve upon this in our model.
+Notice that we provide Number and Boolean values as strings.
+We&rsquo;ll perform the conversion when we map our model to Attributes at runtime.</p>
+
+<h3 id="building-declaratively">Building Declaratively</h3>
+
+<p>We don&rsquo;t want to use the <code>AttributeValue</code> library type directly because it&rsquo;s cumbersome and error-prone.
+We also want to declare our attributes with minimum syntactical ceremony - the F# way!</p>
+
+<p>To achieve this, we can model the documented type cases with discriminated unions.
+Notice that the <code>DocList</code> case is a recursive type because it references itself,
+while the <code>DocMap</code> case is mutually recursive because it references the <code>Attr</code> type.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">type</span> <span class="nc">Attr</span> <span class="o">=</span>
+  <span class="o">|</span> <span class="n">Attr</span> <span class="k">of</span> <span class="n">name</span><span class="o">:</span><span class="kt">string</span> <span class="o">*</span> <span class="n">AttrValue</span>
+<span class="ow">and</span>  <span class="n">AttrValue</span> <span class="o">=</span>
+  <span class="o">|</span> <span class="n">ScalarString</span> <span class="k">of</span> <span class="kt">string</span>
+  <span class="o">|</span> <span class="n">ScalarDecimal</span> <span class="k">of</span> <span class="kt">decimal</span>
+  <span class="o">|</span> <span class="n">ScalarBinary</span> <span class="k">of</span> <span class="kt">string</span>
+  <span class="o">|</span> <span class="n">ScalarBool</span> <span class="k">of</span> <span class="kt">bool</span>
+  <span class="o">|</span> <span class="n">ScalarNull</span>
+  <span class="o">|</span> <span class="n">SetString</span> <span class="k">of</span> <span class="kt">string</span> <span class="n">Set</span>
+  <span class="o">|</span> <span class="n">SetDecimal</span> <span class="k">of</span> <span class="kt">decimal</span> <span class="n">Set</span>
+  <span class="o">|</span> <span class="n">SetBinary</span> <span class="k">of</span> <span class="kt">string</span> <span class="n">Set</span>
+  <span class="o">|</span> <span class="n">DocList</span> <span class="k">of</span> <span class="n">AttrValue</span> <span class="kt">list</span>
+  <span class="o">|</span> <span class="n">DocMap</span> <span class="k">of</span> <span class="n">Attr</span> <span class="kt">list</span></code></pre></div>
+<p>We can then build our example document with a collection of <code>Attr</code>s.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">let</span> <span class="nv">attributes</span> <span class="o">=</span>
+  <span class="o">[</span> <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;Day&#34;</span><span class="o">,</span> <span class="n">ScalarString</span> <span class="s">&#34;Monday&#34;</span><span class="o">)</span>
+    <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;UnreadEmails&#34;</span><span class="o">,</span> <span class="n">ScalarDecimal</span> <span class="n">42m</span><span class="o">)</span>
+    <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;ItemsOnMyDesk&#34;</span><span class="o">,</span>
+      <span class="n">DocList</span>
+        <span class="o">[</span> <span class="n">ScalarString</span> <span class="s">&#34;Coffee Cup&#34;</span>
+          <span class="n">ScalarString</span> <span class="s">&#34;Telephone&#34;</span>
+          <span class="n">DocMap</span>
+            <span class="o">[</span> <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;Pens&#34;</span><span class="o">,</span> <span class="n">DocMap</span> <span class="o">[</span> <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;Quantity&#34;</span><span class="o">,</span> <span class="n">ScalarDecimal</span> <span class="n">3m</span><span class="o">)</span> <span class="o">])</span>
+              <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;Pencils&#34;</span><span class="o">,</span> <span class="n">DocMap</span> <span class="o">[</span> <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;Quantity&#34;</span><span class="o">,</span> <span class="n">ScalarDecimal</span> <span class="n">2m</span><span class="o">)</span> <span class="o">])</span>
+              <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;Erasers&#34;</span><span class="o">,</span> <span class="n">DocMap</span> <span class="o">[</span> <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;Quantity&#34;</span><span class="o">,</span> <span class="n">ScalarDecimal</span> <span class="n">1m</span><span class="o">)</span> <span class="o">])</span>
+            <span class="o">]</span>
+        <span class="o">])</span>
+  <span class="o">]</span></code></pre></div>
+<p>Now we need a way to map our <code>Attr list</code> into the target type:
+<code>Dictionary&lt;string,AttributeValue&gt;</code>.
+Notice again the <code>rec</code> &amp; <code>and</code> directives are required as the functions are
+mutually recursive, reflecting the data structure.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">open</span> <span class="nn">System.IO</span>
+<span class="k">open</span> <span class="nn">System.IO.Compression</span>
+
+<span class="k">let</span> <span class="nv">toGzipMemoryStream</span> <span class="o">(</span><span class="n">s</span><span class="o">:</span><span class="kt">string</span><span class="o">)</span> <span class="o">=</span>
+  <span class="k">let</span> <span class="nv">output</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MemoryStream</span> <span class="bp">()</span>
+  <span class="k">use</span> <span class="n">zipStream</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GZipStream</span> <span class="o">(</span><span class="n">output</span><span class="o">,</span> <span class="nn">CompressionMode</span><span class="p">.</span><span class="n">Compress</span><span class="o">,</span> <span class="k">true</span><span class="o">)</span>
+  <span class="k">use</span> <span class="n">writer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StreamWriter</span> <span class="o">(</span><span class="n">zipStream</span><span class="o">)</span>
+  <span class="n">writer</span><span class="o">.</span><span class="n">Write</span> <span class="n">s</span>
+  <span class="n">output</span>
+
+<span class="k">let</span> <span class="nv">rec</span> <span class="n">mapAttrValue</span> <span class="o">=</span> <span class="k">function</span>
+  <span class="o">|</span> <span class="n">ScalarString</span> <span class="n">s</span>  <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">S</span> <span class="o">=</span> <span class="n">s</span><span class="o">)</span>
+  <span class="o">|</span> <span class="n">ScalarDecimal</span> <span class="n">n</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">N</span> <span class="o">=</span> <span class="kt">string</span> <span class="n">n</span><span class="o">)</span>
+  <span class="o">|</span> <span class="n">ScalarBinary</span> <span class="n">s</span>  <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">B</span> <span class="o">=</span> <span class="n">toGzipMemoryStream</span> <span class="n">s</span><span class="o">)</span>
+  <span class="o">|</span> <span class="n">ScalarBool</span> <span class="n">b</span>    <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">BOOL</span> <span class="o">=</span> <span class="n">b</span><span class="o">)</span>
+  <span class="o">|</span> <span class="n">ScalarNull</span>      <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">NULL</span> <span class="o">=</span> <span class="k">true</span><span class="o">)</span>
+  <span class="o">|</span> <span class="n">SetString</span> <span class="n">ss</span>    <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">SS</span> <span class="o">=</span> <span class="n">ResizeArray</span> <span class="n">ss</span><span class="o">)</span>
+  <span class="o">|</span> <span class="n">SetDecimal</span> <span class="n">ns</span>   <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">NS</span> <span class="o">=</span> <span class="n">ResizeArray</span> <span class="o">(</span><span class="nn">Seq</span><span class="p">.</span><span class="n">map</span> <span class="kt">string</span> <span class="n">ns</span><span class="o">))</span>
+  <span class="o">|</span> <span class="n">SetBinary</span> <span class="n">bs</span>    <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">BS</span> <span class="o">=</span> <span class="n">ResizeArray</span> <span class="o">(</span><span class="nn">Seq</span><span class="p">.</span><span class="n">map</span> <span class="n">toGzipMemoryStream</span> <span class="n">bs</span><span class="o">))</span>
+  <span class="o">|</span> <span class="n">DocList</span> <span class="n">l</span>       <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">L</span> <span class="o">=</span> <span class="n">ResizeArray</span> <span class="o">(</span><span class="nn">List</span><span class="p">.</span><span class="n">map</span> <span class="n">mapAttrValue</span> <span class="n">l</span><span class="o">))</span>
+  <span class="o">|</span> <span class="n">DocMap</span> <span class="n">m</span>        <span class="o">-&gt;</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">M</span> <span class="o">=</span> <span class="n">mapAttrsToDictionary</span> <span class="n">m</span><span class="o">)</span>
+
+<span class="ow">and</span> <span class="n">mapAttr</span> <span class="o">(</span><span class="n">Attr</span> <span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">value</span><span class="o">))</span> <span class="o">=</span>
+  <span class="n">name</span><span class="o">,</span> <span class="n">mapAttrValue</span> <span class="n">value</span>
+
+<span class="ow">and</span> <span class="n">mapAttrsToDictionary</span> <span class="o">=</span>
+  <span class="nn">List</span><span class="p">.</span><span class="n">map</span> <span class="n">mapAttr</span> <span class="o">&gt;&gt;</span> <span class="n">dict</span> <span class="o">&gt;&gt;</span> <span class="n">Dictionary</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">,</span><span class="n">AttributeValue</span><span class="o">&gt;</span></code></pre></div>
+<p>The function below uses our map function before
+calling the <code>PutItemAsync</code> library method.
+It then converts the TPL <code>Task&lt;'T&gt;</code> type into an F# <code>async</code>
+and models the response with the <code>Result</code> type.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">open</span> <span class="nn">System.Net</span>
+
+<span class="k">let</span> <span class="nv">putItem</span> <span class="n">tableName</span> <span class="n">fields</span> <span class="o">:</span> <span class="kt">string</span> <span class="o">-&gt;</span> <span class="n">Attr</span> <span class="kt">list</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">Unit</span><span class="o">,</span> <span class="kt">string</span><span class="o">&gt;</span> <span class="o">=</span>
+  <span class="k">use</span> <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AmazonDynamoDBClient</span><span class="bp">()</span>
+  <span class="k">new</span> <span class="n">PutItemRequest</span> <span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">mapAttrsToDictionary</span> <span class="n">fields</span><span class="o">)</span>
+  <span class="o">|&gt;</span> <span class="n">client</span><span class="o">.</span><span class="n">PutItemAsync</span>
+  <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">AwaitTask</span>
+  <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">RunSynchronously</span>
+  <span class="o">|&gt;</span> <span class="k">fun</span> <span class="n">r</span> <span class="o">-&gt;</span>
+    <span class="k">match</span> <span class="n">r</span><span class="o">.</span><span class="n">HttpStatusCode</span> <span class="k">with</span>
+    <span class="o">|</span> <span class="nn">HttpStatusCode</span><span class="p">.</span><span class="n">OK</span> <span class="o">-&gt;</span> <span class="n">Ok</span> <span class="bp">()</span>
+    <span class="o">|</span> <span class="o">_</span> <span class="k">as</span> <span class="n">status</span> <span class="o">-&gt;</span> <span class="n">Error</span> <span class="o">&lt;|</span> <span class="n">sprintf</span> <span class="s">&#34;Unexpected status code &#39;%A&#39;&#34;</span> <span class="n">status</span></code></pre></div>
+<p>This completes the first half of our journey. Now we can move onto reading an item.</p>
+
+<h2 id="the-read-model">The Read Model</h2>
+
+<p>DynamoDB provides multiple ways of retrieving data.
+We can use <strong>Get</strong> to retrieve a single item,
+and <strong>Query</strong>, and <strong>Scan</strong> to return an item collection.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">let</span> <span class="nv">attributes</span> <span class="o">=</span>
+  <span class="o">[</span> <span class="s">&#34;id&#34;</span> <span class="o">,</span> <span class="k">new</span> <span class="n">AttributeValue</span> <span class="o">(</span><span class="n">S</span> <span class="o">=</span> <span class="s">&#34;123&#34;</span><span class="o">)</span> <span class="o">]</span>
+  <span class="o">|&gt;</span> <span class="n">dict</span>
+  <span class="o">|&gt;</span> <span class="n">Dictionary</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">,</span><span class="n">AttributeValue</span><span class="o">&gt;</span>
+
+<span class="k">let</span> <span class="nv">response</span> <span class="o">:</span> <span class="n">GetItemResponse</span> <span class="o">=</span>
+  <span class="k">new</span> <span class="n">GetItemRequest</span> <span class="o">(</span><span class="s">&#34;my_table_name&#34;</span><span class="o">,</span> <span class="n">attributes</span><span class="o">)</span>
+  <span class="o">|&gt;</span> <span class="n">client</span><span class="o">.</span><span class="n">GetItemAsync</span>
+  <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">AwaitTask</span>
+  <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">RunSynchronously</span>
+
+<span class="k">let</span> <span class="nv">item</span> <span class="o">:</span> <span class="n">Dictionary</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">,</span><span class="n">AttributeValue</span><span class="o">&gt;</span> <span class="o">=</span>
+  <span class="n">response</span><span class="o">.</span><span class="n">Item</span></code></pre></div>
+<h3 id="getting-an-item">Getting an item</h3>
+
+<p>The DynamoDB library expects a <code>Dictionary&lt;string,AttributeValue&gt;</code>
+to specify the identifier of the single item we wish to retrieve.
+This means we can use the write model to provide the identifier.
+The item is also returned using the same <code>Dictionary&lt;string,AttributeValue&gt;</code>.
+Our challenge, therefore, is to <strong>turn the Dictionary into our domain type</strong>.
+This sounds like a good fit for the Reader applicative.</p>
+
+<h3 id="reader-applicative">Reader Applicative</h3>
+
+<p>Let&rsquo;s define a simple domain type that
+we want to construct from the <code>GetItemResponse</code>
+Having a function with explicit arguments
+will make it easier to build the record
+one property at a time.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">type</span> <span class="nc">Order</span> <span class="o">=</span>
+  <span class="o">{</span> <span class="n">Name</span> <span class="o">:</span> <span class="kt">string</span>
+    <span class="n">Description</span> <span class="o">:</span> <span class="kt">string</span>
+    <span class="n">IsVerified</span> <span class="o">:</span> <span class="kt">bool</span>
+    <span class="n">Quantity</span> <span class="o">:</span> <span class="n">int</span>
+    <span class="n">Cost</span> <span class="o">:</span> <span class="kt">float</span> <span class="o">}</span>
+
+<span class="k">let</span> <span class="nv">buildOrder</span> <span class="n">name</span> <span class="n">desc</span> <span class="n">isVerified</span> <span class="n">qty</span> <span class="n">cost</span> <span class="o">=</span>
+  <span class="o">{</span> <span class="n">Name</span> <span class="o">=</span> <span class="n">name</span> 
+    <span class="n">Description</span> <span class="o">=</span> <span class="n">description</span>
+    <span class="n">IsVerified</span> <span class="o">=</span> <span class="n">isVerified</span> 
+    <span class="n">Quantity</span> <span class="o">=</span> <span class="n">qty</span> 
+    <span class="n">Cost</span> <span class="o">=</span> <span class="n">cost</span> <span class="o">}</span></code></pre></div>
+<p>We&rsquo;re going to combine the work from two articles
+to create our <strong>Reader Applicative</strong> below:
+Matthew Podwysocki&rsquo;s
+article on the <a href="http://webcache.googleusercontent.com/search?q=cache:EibmCdF8430J:codebetter.com/matthewpodwysocki/2010/01/07/much-ado-about-monads-reader-edition/+&amp;cd=1&amp;hl=en&amp;ct=clnk&amp;gl=uk">Reader Monad</a> (cached)
+and Scott Wlaschin&rsquo;s article that covers
+<a href="https://fsharpforfunandprofit.com/posts/monadster-3/">applicatives</a>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">type</span> <span class="nc">Reader</span><span class="o">&lt;</span><span class="k">&#39;</span><span class="n">a</span><span class="o">,</span> <span class="k">&#39;</span><span class="n">b</span><span class="o">&gt;</span> <span class="o">=</span>
+  <span class="n">Reader</span> <span class="k">of</span> <span class="o">(</span><span class="k">&#39;</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="k">&#39;</span><span class="n">b</span><span class="o">)</span>
+
+<span class="k">module</span> <span class="nn">Reader</span> <span class="o">=</span>
+
+  <span class="k">let</span> <span class="nv">run</span> <span class="o">(</span><span class="n">Reader</span> <span class="n">f</span><span class="o">)</span> <span class="n">a</span> <span class="o">=</span>
+    <span class="n">f</span> <span class="n">a</span>
+
+  <span class="k">let</span> <span class="nv">retn</span> <span class="n">a</span> <span class="o">=</span>
+    <span class="n">Reader</span> <span class="o">(</span><span class="k">fun</span> <span class="o">_</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="o">)</span>
+
+  <span class="k">let</span> <span class="nv">map</span> <span class="n">f</span> <span class="n">r</span> <span class="o">=</span>
+    <span class="n">Reader</span> <span class="o">(</span><span class="k">fun</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">run</span> <span class="n">r</span> <span class="n">a</span> <span class="o">|&gt;</span> <span class="n">f</span><span class="o">)</span>
+
+  <span class="k">let</span> <span class="nv">apply</span> <span class="n">f</span> <span class="n">r</span> <span class="o">=</span> <span class="c1">// Reader applicative function
+</span><span class="c1"></span>    <span class="n">Reader</span> <span class="o">(</span><span class="k">fun</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">run</span> <span class="n">r</span> <span class="n">a</span> <span class="o">|&gt;</span> <span class="n">run</span> <span class="n">f</span> <span class="n">a</span><span class="o">)</span></code></pre></div>
+<p>The <code>Reader</code> type is completely generic.
+It&rsquo;s a single-case union type that contains a simple function: <code>a -&gt; b</code>.
+The <code>Reader</code> module contains our helper functions.
+The <code>run</code> function is needed to unwrap the reader function,
+evaluate it with the provided input <code>a</code> and return the <code>b</code>.
+<code>run</code> is the only function in the module that doesn&rsquo;t return a <code>Reader</code>.</p>
+
+<p><code>retn</code> lets us create a <code>Reader</code> from a single value.
+It embeds the value inside a function in which the single argument is ignored.</p>
+
+<p><code>map</code> lets us run a function against the returned value of a reader function.
+This is useful when the input value to our function is wrapped inside a <code>Reader</code>.</p>
+
+<p><code>apply</code> takes two <code>Reader</code> arguments and extracts the values from both by
+calling the <code>run</code> function.
+The two extracted values are related.
+The first value is a function. The second value is the
+first argument to the first extracted function.
+We &lsquo;apply&rsquo; the function to the value
+and wrap the returned value in a <code>Reader</code>
+This is useful when your function is wrapped inside a <code>Reader</code>,
+and arguments to the function are also wrapped in <code>Reader</code>.</p>
+
+<p>If we apply our <code>map</code> function to our <code>buildOrder</code> function
+this is exactly what we get: a multi-argument function wrapped in a reader.
+With some helper functions to extract the correct value from the library
+<code>Attribute</code> and some custom operators we can create our record with minimal syntax.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">let</span> <span class="nv">getItem</span> <span class="n">tableName</span> <span class="n">reader</span> <span class="n">fields</span> <span class="o">=</span>
+  <span class="k">new</span> <span class="n">GetItemRequest</span> <span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">mapAttrsToDictionary</span> <span class="n">fields</span><span class="o">)</span>
+  <span class="o">|&gt;</span> <span class="n">client</span><span class="o">.</span><span class="n">GetItemAsync</span>
+  <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">AwaitTask</span>
+  <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">RunSynchronously</span>
+  <span class="o">|&gt;</span> <span class="k">fun</span> <span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="n">Item</span>
+  <span class="o">|&gt;</span> <span class="nn">Reader</span><span class="p">.</span><span class="n">run</span> <span class="n">reader</span>
+
+<span class="k">let</span> <span class="o">(&lt;!&gt;)</span> <span class="o">=</span> <span class="nn">Reader</span><span class="p">.</span><span class="n">map</span>
+<span class="k">let</span> <span class="o">(&lt;*&gt;)</span> <span class="o">=</span> <span class="nn">Reader</span><span class="p">.</span><span class="n">apply</span>
+
+<span class="k">let</span> <span class="nv">extract</span> <span class="n">f</span> <span class="o">(</span><span class="n">d</span><span class="o">:</span><span class="n">Dictionary</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">,</span><span class="n">AttributeValue</span><span class="o">&gt;)</span> <span class="o">=</span> <span class="n">f</span> <span class="n">d</span>
+<span class="k">let</span> <span class="nv">readString</span> <span class="n">key</span>   <span class="o">=</span> <span class="n">extract</span> <span class="o">(</span><span class="k">fun</span> <span class="n">d</span> <span class="o">-&gt;</span> <span class="n">d</span><span class="o">.[</span><span class="n">key</span><span class="o">].</span><span class="n">S</span><span class="o">)</span> <span class="o">|&gt;</span> <span class="n">Reader</span>
+<span class="k">let</span> <span class="nv">readBool</span>   <span class="n">key</span>   <span class="o">=</span> <span class="n">extract</span> <span class="o">(</span><span class="k">fun</span> <span class="n">d</span> <span class="o">-&gt;</span> <span class="n">d</span><span class="o">.[</span><span class="n">key</span><span class="o">].</span><span class="n">BOOL</span><span class="o">)</span> <span class="o">|&gt;</span> <span class="n">Reader</span>
+<span class="k">let</span> <span class="nv">readNumber</span> <span class="n">key</span> <span class="n">f</span> <span class="o">=</span> <span class="n">extract</span> <span class="o">(</span><span class="k">fun</span> <span class="n">d</span> <span class="o">-&gt;</span> <span class="n">d</span><span class="o">.[</span><span class="n">key</span><span class="o">].</span><span class="n">N</span><span class="o">)</span> <span class="o">|&gt;</span> <span class="n">f</span> <span class="o">|&gt;</span> <span class="n">Reader</span>
+
+<span class="k">let</span> <span class="nv">readOrder</span> <span class="o">=</span>
+  <span class="n">buildOrder</span>
+  <span class="o">&lt;!&gt;</span> <span class="n">readString</span> <span class="s">&#34;name&#34;</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readString</span> <span class="s">&#34;description&#34;</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readBool</span>   <span class="s">&#34;isVerified&#34;</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readNumber</span> <span class="s">&#34;quantity&#34;</span> <span class="n">int</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readNumber</span> <span class="s">&#34;cost&#34;</span> <span class="kt">float</span>
+
+<span class="k">let</span> <span class="nv">getOrder</span> <span class="n">id</span> <span class="o">:</span> <span class="n">Order</span> <span class="o">=</span>
+  <span class="n">getItem</span> <span class="s">&#34;orders&#34;</span> <span class="n">readOrder</span> <span class="o">[</span> <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;id&#34;</span><span class="o">,</span> <span class="n">ScalarString</span> <span class="n">id</span><span class="o">)</span> <span class="o">]</span></code></pre></div>
+<h3 id="nested-objects">Nested Objects</h3>
+
+<p>Let&rsquo;s extend our example to contain a nested document.
+We can see that the reader pattern lets us define functions
+that will plug into a parent reader expression.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">type</span> <span class="nc">Merchant</span> <span class="o">=</span>
+  <span class="o">{</span> <span class="n">Id</span> <span class="o">:</span> <span class="n">int</span> 
+    <span class="n">Region</span> <span class="o">:</span> <span class="kt">string</span> <span class="o">}</span>
+
+<span class="k">let</span> <span class="nv">buildMerchant</span> <span class="n">id</span> <span class="n">region</span> <span class="o">=</span>
+  <span class="o">{</span> <span class="n">Id</span> <span class="o">=</span> <span class="n">id</span>
+    <span class="n">Region</span> <span class="o">=</span> <span class="n">region</span> <span class="o">}</span>
+  
+<span class="k">let</span> <span class="nv">readMerchant</span> <span class="o">=</span>
+  <span class="n">buildMerchant</span>
+  <span class="o">&lt;!&gt;</span> <span class="n">readNumber</span> <span class="s">&#34;id&#34;</span> <span class="n">int</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readString</span> <span class="s">&#34;region&#34;</span>
+
+<span class="k">type</span> <span class="nc">Order</span> <span class="o">=</span>
+  <span class="o">{</span> <span class="n">Name</span> <span class="o">:</span> <span class="kt">string</span>
+    <span class="n">Description</span> <span class="o">:</span> <span class="kt">string</span>
+    <span class="n">IsVerified</span> <span class="o">:</span> <span class="kt">bool</span>
+    <span class="n">Merchant</span> <span class="o">:</span> <span class="n">Merhant</span> <span class="c1">// new field
+</span><span class="c1"></span>    <span class="n">Quantity</span> <span class="o">:</span> <span class="n">int</span>
+    <span class="n">Cost</span> <span class="o">:</span> <span class="kt">float</span> <span class="o">}</span>
+
+<span class="k">let</span> <span class="nv">buildOrder</span> <span class="n">name</span> <span class="n">desc</span> <span class="n">isVerified</span> <span class="n">merchant</span> <span class="n">qty</span> <span class="n">cost</span> <span class="o">=</span>
+  <span class="o">{</span> <span class="n">Name</span> <span class="o">=</span> <span class="n">name</span> 
+    <span class="n">Description</span> <span class="o">=</span> <span class="n">description</span>
+    <span class="n">IsVerified</span> <span class="o">=</span> <span class="n">isVerified</span>
+    <span class="n">Merchant</span> <span class="o">=</span> <span class="n">merchant</span>
+    <span class="n">Quantity</span> <span class="o">=</span> <span class="n">qty</span> 
+    <span class="n">Cost</span> <span class="o">=</span> <span class="n">cost</span> <span class="o">}</span>
+
+<span class="k">let</span> <span class="nv">readOrder</span> <span class="o">=</span>
+  <span class="n">buildOrder</span>
+  <span class="o">&lt;!&gt;</span> <span class="n">readString</span>   <span class="s">&#34;name&#34;</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readString</span>   <span class="s">&#34;description&#34;</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readBool</span>     <span class="s">&#34;isVerified&#34;</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readMerchant</span> <span class="s">&#34;merchant&#34;</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readNumber</span>   <span class="s">&#34;quantity&#34;</span> <span class="n">int</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readNumber</span>   <span class="s">&#34;cost&#34;</span> <span class="kt">float</span></code></pre></div>
+<h3 id="result-reader">Result Reader</h3>
+
+<p>In our example, we are reading items from the <code>Dictionary</code> unsafely.
+Let&rsquo;s introduce the <code>Result</code> type to help us handle errors gracefully
+and better support for reading optional fields on our domain objects.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">module</span> <span class="nn">ReaderResult</span> <span class="o">=</span>
+
+  <span class="k">let</span> <span class="nv">retn</span> <span class="n">a</span> <span class="o">=</span>
+    <span class="nn">Result</span><span class="p">.</span><span class="n">Ok</span> <span class="n">a</span> <span class="o">|&gt;</span> <span class="nn">Reader</span><span class="p">.</span><span class="n">retn</span>
+
+  <span class="k">let</span> <span class="nv">map</span> <span class="n">f</span> <span class="o">=</span>
+    <span class="nn">Result</span><span class="p">.</span><span class="n">map</span> <span class="n">f</span> <span class="o">|&gt;</span> <span class="nn">Reader</span><span class="p">.</span><span class="n">map</span>
+
+  <span class="k">let</span> <span class="nv">apply</span> <span class="n">f</span> <span class="n">r</span> <span class="o">=</span>
+    <span class="n">Reader</span> <span class="o">&lt;|</span> <span class="k">fun</span> <span class="n">a</span> <span class="o">-&gt;</span>
+      <span class="k">let</span> <span class="nv">fa</span> <span class="o">=</span> <span class="nn">Reader</span><span class="p">.</span><span class="n">run</span> <span class="n">f</span> <span class="n">a</span>
+      <span class="k">let</span> <span class="nv">fb</span> <span class="o">=</span> <span class="nn">Reader</span><span class="p">.</span><span class="n">run</span> <span class="n">r</span> <span class="n">a</span>
+      <span class="k">match</span> <span class="n">fa</span><span class="o">,</span> <span class="n">fb</span> <span class="k">with</span>
+      <span class="o">|</span> <span class="n">Ok</span> <span class="n">a</span><span class="o">,</span> <span class="n">Ok</span> <span class="n">b</span> <span class="o">-&gt;</span> <span class="n">Ok</span> <span class="o">(</span><span class="n">a</span> <span class="n">b</span><span class="o">)</span>
+      <span class="o">|</span> <span class="n">Error</span> <span class="n">e</span><span class="o">,</span> <span class="o">_</span> <span class="o">-&gt;</span> <span class="n">Error</span> <span class="n">e</span>
+      <span class="o">|</span> <span class="o">_,</span> <span class="n">Error</span> <span class="n">e</span> <span class="o">-&gt;</span> <span class="n">Error</span> <span class="n">e</span></code></pre></div>
+<p>There is no type definition required as
+the <code>map</code> and <code>apply</code> functions return a
+composed type: <code>Reader&lt;'a,Result&lt;'b,'c&gt;&gt;</code>.</p>
+
+<p>Notice that the <code>apply</code> function
+has to pattern patch against two <code>Result</code>s.
+The function inside the first result is
+applied to the value inside the second result
+provided that both <code>Result</code>s are <code>Ok</code>.</p>
+
+<p>The helper functions below read from the
+<code>GetItemResponse</code> safely by turning the
+contained dictionary into a <code>Map&lt;string,Attribute&gt;</code>
+and using the <code>TryFind</code> function.
+This means we will return an <code>Error</code> case if we
+attempt to read a key from the dictionary that
+doesn&rsquo;t exist.</p>
+<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">let</span> <span class="nv">getItem</span> <span class="n">tableName</span> <span class="n">reader</span> <span class="n">fields</span> <span class="o">=</span>
+  <span class="k">new</span> <span class="n">GetItemRequest</span> <span class="o">(</span><span class="n">tableName</span><span class="o">,</span> <span class="n">mapAttrsToDictionary</span> <span class="n">fields</span><span class="o">)</span>
+  <span class="o">|&gt;</span> <span class="n">client</span><span class="o">.</span><span class="n">GetItemAsync</span>
+  <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">AwaitTask</span>
+  <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">RunSynchronously</span>
+  <span class="o">|&gt;</span> <span class="k">fun</span> <span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="n">Item</span>
+  <span class="o">|&gt;</span> <span class="nn">Seq</span><span class="p">.</span><span class="n">map</span> <span class="o">(|</span><span class="n">KeyValue</span><span class="o">|)</span>
+  <span class="o">|&gt;</span> <span class="nn">Map</span><span class="p">.</span><span class="n">ofSeq</span>
+  <span class="o">|&gt;</span> <span class="nn">Reader</span><span class="p">.</span><span class="n">run</span> <span class="n">reader</span>
+  <span class="o">|&gt;</span> <span class="n">Ok</span>
+
+<span class="k">let</span> <span class="nv">mapFind</span> <span class="n">key</span> <span class="o">=</span>
+  <span class="nn">Map</span><span class="p">.</span><span class="n">tryFind</span> <span class="n">key</span>
+  <span class="o">&gt;&gt;</span> <span class="k">function</span>
+  <span class="o">|</span> <span class="n">Some</span> <span class="n">x</span> <span class="o">-&gt;</span> <span class="n">Ok</span> <span class="n">x</span>
+  <span class="o">|</span> <span class="n">None</span> <span class="o">-&gt;</span> <span class="n">Error</span> <span class="o">&lt;|</span> <span class="n">sprintf</span> <span class="s">&#34;could not find key %s&#34;</span> <span class="n">key</span>
+
+<span class="k">let</span> <span class="nv">readString</span> <span class="n">key</span> <span class="o">=</span>
+  <span class="n">Reader</span> <span class="o">(</span><span class="n">mapFind</span> <span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="nn">Result</span><span class="p">.</span><span class="n">map</span> <span class="o">(</span><span class="k">fun</span> <span class="o">(</span><span class="n">a</span><span class="o">:</span><span class="n">AttributeValue</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="o">.</span><span class="n">S</span><span class="o">))</span>
+
+<span class="k">let</span> <span class="nv">readStringAs</span> <span class="n">key</span> <span class="n">f</span> <span class="o">=</span>
+  <span class="n">Reader</span> <span class="o">(</span><span class="n">mapFind</span> <span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="nn">Result</span><span class="p">.</span><span class="n">map</span> <span class="o">(</span><span class="k">fun</span> <span class="o">(</span><span class="n">a</span><span class="o">:</span><span class="n">AttributeValue</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="o">.</span><span class="n">S</span><span class="o">)</span> <span class="o">&gt;&gt;</span> <span class="nn">Result</span><span class="p">.</span><span class="n">bind</span> <span class="n">f</span><span class="o">)</span>
+
+<span class="k">let</span> <span class="nv">readStringAsOption</span> <span class="n">key</span> <span class="n">f</span> <span class="o">=</span>
+  <span class="n">Reader</span> <span class="o">(</span><span class="nn">Map</span><span class="p">.</span><span class="n">tryFind</span> <span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="nn">Option</span><span class="p">.</span><span class="n">map</span> <span class="o">(</span><span class="k">fun</span> <span class="o">(</span><span class="n">a</span><span class="o">:</span><span class="n">AttributeValue</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="n">a</span><span class="o">.</span><span class="n">S</span><span class="o">)</span> <span class="o">&gt;&gt;</span> <span class="nn">Option</span><span class="p">.</span><span class="n">bind</span> <span class="n">f</span><span class="o">)</span>
+
+<span class="k">let</span> <span class="nv">readStringSet</span> <span class="n">key</span> <span class="o">=</span>
+  <span class="n">Reader</span> <span class="o">(</span><span class="n">mapFind</span> <span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="nn">Result</span><span class="p">.</span><span class="n">map</span> <span class="o">(</span><span class="k">fun</span> <span class="o">(</span><span class="n">a</span><span class="o">:</span><span class="n">AttributeValue</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="nn">Set</span><span class="p">.</span><span class="n">ofSeq</span> <span class="n">a</span><span class="o">.</span><span class="n">SS</span><span class="o">))</span>
+
+<span class="k">let</span> <span class="o">(&lt;!&gt;)</span> <span class="o">=</span> <span class="nn">ResultReader</span><span class="p">.</span><span class="n">map</span>
+<span class="k">let</span> <span class="o">(&lt;*&gt;)</span> <span class="o">=</span> <span class="nn">ResultReader</span><span class="p">.</span><span class="n">apply</span>
+
+<span class="k">let</span> <span class="nv">stringToGuid</span> <span class="n">e</span> <span class="o">(</span><span class="n">date</span><span class="o">:</span><span class="n">String</span><span class="o">)</span> <span class="o">=</span>
+  <span class="n">date</span>
+  <span class="o">|&gt;</span> <span class="nn">Guid</span><span class="p">.</span><span class="n">TryParse</span>
+  <span class="o">|&gt;</span> <span class="k">function</span> <span class="o">|</span> <span class="k">true</span><span class="o">,</span> <span class="n">x</span> <span class="o">-&gt;</span> <span class="n">Ok</span> <span class="n">x</span> <span class="o">|</span> <span class="o">_</span> <span class="o">-&gt;</span> <span class="n">Error</span> <span class="s">&#34;could not parse to guid&#34;</span>
+
+<span class="k">let</span> <span class="nv">stringToDate</span> <span class="o">(</span><span class="n">date</span><span class="o">:</span><span class="n">String</span><span class="o">)</span> <span class="o">=</span>
+  <span class="n">date</span>
+  <span class="o">|&gt;</span> <span class="nn">DateTime</span><span class="p">.</span><span class="n">TryParse</span>
+  <span class="o">|&gt;</span> <span class="k">function</span> <span class="o">|</span> <span class="k">true</span><span class="o">,</span> <span class="n">x</span> <span class="o">-&gt;</span> <span class="n">Some</span> <span class="n">x</span> <span class="o">|</span> <span class="o">_</span> <span class="o">-&gt;</span> <span class="n">None</span>
+
+<span class="k">type</span> <span class="nc">Order</span> <span class="o">=</span>
+  <span class="o">{</span> <span class="n">Name</span> <span class="o">:</span> <span class="kt">string</span>
+    <span class="n">OrderId</span> <span class="o">:</span> <span class="n">Guid</span>
+    <span class="n">Fulfilled</span> <span class="o">:</span> <span class="n">DateTime</span> <span class="n">option</span>
+    <span class="n">Tags</span> <span class="o">:</span> <span class="kt">string</span> <span class="n">Set</span> <span class="o">}</span>
+
+<span class="k">let</span> <span class="nv">buildOrder</span> <span class="n">name</span> <span class="n">orderId</span> <span class="n">fulfilled</span> <span class="n">tags</span> <span class="o">=</span>
+  <span class="o">{</span> <span class="n">Name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="n">OrderId</span> <span class="o">=</span> <span class="n">orderId</span>
+    <span class="n">Fulfilled</span> <span class="o">=</span> <span class="n">fulfilled</span>
+    <span class="n">Tags</span> <span class="o">=</span> <span class="n">tags</span> <span class="o">}</span>
+  
+<span class="k">let</span> <span class="nv">readOrder</span> <span class="o">=</span>
+  <span class="n">buildOrder</span>
+  <span class="o">&lt;!&gt;</span> <span class="n">readString</span> <span class="s">&#34;name&#34;</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readStringAs</span> <span class="s">&#34;orderId&#34;</span> <span class="n">stringToGuid</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readStringAsOption</span> <span class="s">&#34;fulfilled&#34;</span> <span class="n">stringToDate</span>
+  <span class="o">&lt;*&gt;</span> <span class="n">readStringAsSet</span> <span class="s">&#34;tags&#34;</span>
+
+<span class="k">let</span> <span class="nv">getOrder</span> <span class="n">id</span> <span class="o">:</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">Order</span><span class="o">,</span><span class="kt">string</span><span class="o">&gt;</span> <span class="o">=</span>
+  <span class="n">getItem</span> <span class="s">&#34;orders&#34;</span> <span class="n">readOrder</span> <span class="o">[</span> <span class="n">Attr</span> <span class="o">(</span><span class="s">&#34;id&#34;</span><span class="o">,</span> <span class="n">ScalarString</span> <span class="n">id</span><span class="o">)</span> <span class="o">]</span></code></pre></div>
+<h2 id="that-s-all">That&rsquo;s All!</h2>
+
+<p>We&rsquo;ve only just scratched the surface of the .net library for DynamoDB.
+There are plenty more features to model functionally,
+including paging, updating and filter expressions.
+If you need a feature-complete library then check out
+(FSharp.AWS.DynamoDB)[<a href="https://github.com/fsprojects/FSharp.AWS.DynamoDB">https://github.com/fsprojects/FSharp.AWS.DynamoDB</a>].</p>
+
+<p>This article mainly intends to show an example of domain modeling
+and the reader applicative, but the green-shoots of a more holistic
+DynamoDB library are visible!</p>
+
+<p>Happy F# Advent Calendar 2019!</p>
+
+</article>
+<nav class="no-print post-nav">
+
+	<a class="prev-post" href="https://blair55.github.io/blog/combining-monads/">
+		<img class="icon-text" src="/img/prev.svg"/>Combining monads</a>
+
+
+</nav>
+
+
+<section id="related">
+  <h4>See Also</h4>
+  <ul>
+    
+  	<li><a href="/blog/combining-monads/">Combining monads</a></li>
+  	
+  	<li><a href="/blog/aws-parameter-store-scripting/">Scripting with AWS Parameter Store</a></li>
+  	
+  	<li><a href="/blog/serverless-package-done-right/">Serverless package done right</a></li>
+  	
+  </ul>
+</section>
+
+
+
+	<div id="disqus_thread" class="no-print"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = '';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+			<hr class="sep" />
+		</main>
+		<footer class="container no-print">
+			<div class="u-footer">
+				
+
+<a href="https://github.com/blair55"><img class="icon-social" src="/img/github.svg" alt="Github"/></a>
+
+
+<a href="https://twitter.com/nickblair"><img class="icon-social" src="/img/twitter.svg" alt="Twitter"/></a>
+
+<a href="https://blair55.github.io/index.xml" target="_blank"><img class="icon-social" src="/img/feed.svg" alt="Feed"></a>
+
+				<p>
+					
+					Theme used: <a href="https://github.com/yursan9/manis-hugo-theme">Manis</a><br>
+					
+					
+					&copy; 2018 Nicholas Blair
+					
+					
+					| <a href="/about/license">License</a>
+					
+				</p>
+				
+				<a href="#brand">
+					<img class="icon-text" src="/img/toup.svg" alt="To Up"/>
+					<span>Back to Up</span>
+				</a>
+				
+			</div>
+		</footer>
+		
+	</body>
+</html>
+

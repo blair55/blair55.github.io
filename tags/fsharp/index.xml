@@ -6,10 +6,20 @@
     <description>Recent content in Fsharp on Tech Nick</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
-    <lastBuildDate>Fri, 02 Aug 2019 11:36:05 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 29 Nov 2019 10:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://blair55.github.io/tags/fsharp/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>A functional wrapper around Dynamo DB</title>
+      <link>https://blair55.github.io/blog/dynamodb-functional-wrapper/</link>
+      <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
+      
+      <guid>https://blair55.github.io/blog/dynamodb-functional-wrapper/</guid>
+      <description>A functional wrapper around the .net AWS DynamoDB SDK A tour of F# capabilities used to enforce the constraints of the DynamoDB client at compile time. We&amp;rsquo;ll look at domain modeling with discriminated unions, data access using the reader applicative, and error handling with the result type.
+Data Types DynamoDB is a key-value &amp;amp; document database. DynamoDB tables are schemaless so each record can contain a different number of attributes.</description>
+    </item>
     
     <item>
       <title>Combining monads</title>
