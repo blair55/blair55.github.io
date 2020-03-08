@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Tech Nick</title>
@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>Aws</title>
+      <title>aws</title>
       <link>https://blair55.github.io/tags/aws/</link>
       <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
       
@@ -21,16 +21,7 @@
     </item>
     
     <item>
-      <title>Bash</title>
-      <link>https://blair55.github.io/tags/bash/</link>
-      <pubDate>Mon, 01 Apr 2019 11:36:05 +0100</pubDate>
-      
-      <guid>https://blair55.github.io/tags/bash/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Dynamodb</title>
+      <title>dynamodb</title>
       <link>https://blair55.github.io/tags/dynamodb/</link>
       <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
       
@@ -39,7 +30,7 @@
     </item>
     
     <item>
-      <title>Fsharp</title>
+      <title>fsharp</title>
       <link>https://blair55.github.io/tags/fsharp/</link>
       <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
       
@@ -48,7 +39,7 @@
     </item>
     
     <item>
-      <title>Functional</title>
+      <title>functional</title>
       <link>https://blair55.github.io/tags/functional/</link>
       <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
       
@@ -57,25 +48,7 @@
     </item>
     
     <item>
-      <title>Git</title>
-      <link>https://blair55.github.io/tags/git/</link>
-      <pubDate>Tue, 16 Oct 2018 10:36:05 +0100</pubDate>
-      
-      <guid>https://blair55.github.io/tags/git/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Jq</title>
-      <link>https://blair55.github.io/tags/jq/</link>
-      <pubDate>Fri, 12 Oct 2018 16:35:01 +0100</pubDate>
-      
-      <guid>https://blair55.github.io/tags/jq/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Monads</title>
+      <title>monads</title>
       <link>https://blair55.github.io/tags/monads/</link>
       <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
       
@@ -84,7 +57,16 @@
     </item>
     
     <item>
-      <title>Parameter Store</title>
+      <title>bash</title>
+      <link>https://blair55.github.io/tags/bash/</link>
+      <pubDate>Mon, 01 Apr 2019 11:36:05 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/bash/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>parameter-store</title>
       <link>https://blair55.github.io/tags/parameter-store/</link>
       <pubDate>Mon, 01 Apr 2019 11:36:05 +0100</pubDate>
       
@@ -93,7 +75,7 @@
     </item>
     
     <item>
-      <title>Serverless</title>
+      <title>serverless</title>
       <link>https://blair55.github.io/tags/serverless/</link>
       <pubDate>Mon, 01 Apr 2019 11:36:05 +0100</pubDate>
       
@@ -102,11 +84,29 @@
     </item>
     
     <item>
-      <title>Zsh</title>
+      <title>git</title>
+      <link>https://blair55.github.io/tags/git/</link>
+      <pubDate>Tue, 16 Oct 2018 10:36:05 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/git/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>zsh</title>
       <link>https://blair55.github.io/tags/zsh/</link>
       <pubDate>Tue, 16 Oct 2018 10:36:05 +0100</pubDate>
       
       <guid>https://blair55.github.io/tags/zsh/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>jq</title>
+      <link>https://blair55.github.io/tags/jq/</link>
+      <pubDate>Fri, 12 Oct 2018 16:35:01 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/jq/</guid>
       <description></description>
     </item>
     

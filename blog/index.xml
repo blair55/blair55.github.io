@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Blog on Tech Nick</title>
@@ -39,7 +39,7 @@ DynamoDB and Data Types Before we get started, let&amp;rsquo;s summarise DynamoD
       <pubDate>Mon, 01 Apr 2019 11:36:05 +0100</pubDate>
       
       <guid>https://blair55.github.io/blog/serverless-package-done-right/</guid>
-      <description>Problem The severless framework package command claims to be useful in CI/CD workflows. The command produces cloud formation stacks json files on disk that can be bundled and considered the &amp;lsquo;deployment artifacts&amp;rsquo; at the end of the pipeline. These artifacts can be provided to the serverless deploy command that could be run at a later date.
+      <description>Problem The Severless Framework package command claims to be useful in CI/CD workflows. The command results in the production of AWS Cloud Formation stack json files (or alternative cloud provider equivalent) on disk. These files can be bundled and considered the &amp;lsquo;deployment artifact&amp;rsquo; at the end of the pipeline. The artifact can be provided to the serverless deploy command that could be run at a later date.
 This two-step package/deploy process is very familiar, so I was lured into using the serverless package command.</description>
     </item>
     

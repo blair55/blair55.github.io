@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Monads on Tech Nick</title>
+    <title>monads on Tech Nick</title>
     <link>https://blair55.github.io/tags/monads/</link>
-    <description>Recent content in Monads on Tech Nick</description>
+    <description>Recent content in monads on Tech Nick</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
     <lastBuildDate>Fri, 29 Nov 2019 10:00:00 +0000</lastBuildDate>

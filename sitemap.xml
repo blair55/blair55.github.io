@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
@@ -8,8 +8,63 @@
   </url>
   
   <url>
+    <loc>https://blair55.github.io/tags/aws/</loc>
+    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/blog/</loc>
+    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/dynamodb/</loc>
+    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/fsharp/</loc>
+    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/functional/</loc>
+    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/monads/</loc>
+    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/</loc>
+    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/</loc>
+    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://blair55.github.io/blog/combining-monads/</loc>
     <lastmod>2019-08-02T11:36:05+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/bash/</loc>
+    <lastmod>2019-04-01T11:36:05+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/parameter-store/</loc>
+    <lastmod>2019-04-01T11:36:05+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blair55.github.io/tags/serverless/</loc>
+    <lastmod>2019-04-01T11:36:05+01:00</lastmod>
   </url>
   
   <url>
@@ -18,97 +73,28 @@
   </url>
   
   <url>
+    <loc>https://blair55.github.io/tags/git/</loc>
+    <lastmod>2018-10-16T10:36:05+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://blair55.github.io/blog/squash-git-commits/</loc>
     <lastmod>2018-10-16T10:36:05+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://blair55.github.io/blog/aws-parameter-store-scripting/</loc>
-    <lastmod>2018-10-12T16:35:01+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/tags/aws/</loc>
-    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/tags/bash/</loc>
-    <lastmod>2019-04-01T11:36:05+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/blog/</loc>
-    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/tags/dynamodb/</loc>
-    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/tags/fsharp/</loc>
-    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/tags/functional/</loc>
-    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/tags/git/</loc>
+    <loc>https://blair55.github.io/tags/zsh/</loc>
     <lastmod>2018-10-16T10:36:05+01:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
     <loc>https://blair55.github.io/tags/jq/</loc>
     <lastmod>2018-10-12T16:35:01+01:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://blair55.github.io/tags/monads/</loc>
-    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/tags/parameter-store/</loc>
-    <lastmod>2019-04-01T11:36:05+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/tags/serverless/</loc>
-    <lastmod>2019-04-01T11:36:05+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/tags/</loc>
-    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/</loc>
-    <lastmod>2019-11-29T10:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://blair55.github.io/tags/zsh/</loc>
-    <lastmod>2018-10-16T10:36:05+01:00</lastmod>
-    <priority>0</priority>
+    <loc>https://blair55.github.io/blog/aws-parameter-store-scripting/</loc>
+    <lastmod>2018-10-12T16:35:01+01:00</lastmod>
   </url>
   
 </urlset>

@@ -3,10 +3,10 @@
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="generator" content="Hugo 0.49.2" />
+		<meta name="generator" content="Hugo 0.66.0" />
 		<title>Serverless package done right - Tech Nick</title>
 
-		<meta name="description" content="Problem The severless framework package command claims to be useful in CI/CD workflows. The command produces cloud formation stacks json files on disk that can be bundled and considered the &lsquo;deployment artifacts&rsquo; at the end of the pipeline. These artifacts can be provided to the serverless deploy command that could be run at a later date.
+		<meta name="description" content="Problem The Severless Framework package command claims to be useful in CI/CD workflows. The command results in the production of AWS Cloud Formation stack json files (or alternative cloud provider equivalent) on disk. These files can be bundled and considered the &lsquo;deployment artifact&rsquo; at the end of the pipeline. The artifact can be provided to the serverless deploy command that could be run at a later date.
 This two-step package/deploy process is very familiar, so I was lured into using the serverless package command.">
 
 
@@ -77,46 +77,33 @@ This two-step package/deploy process is very familiar, so I was lured into using
 </hgroup>
 <hr class="sep" />
 </header>
-	
-
-<h2 id="problem">Problem</h2>
-
-<p>The severless framework <a href="https://serverless.com/framework/docs/providers/aws/guide/packaging/">package command</a> claims to be useful in CI/CD workflows. The command produces cloud formation stacks json files on disk that can be bundled and considered the &lsquo;deployment artifacts&rsquo; at the end of the pipeline. These artifacts can be provided to the <code>serverless deploy</code> command that could be run at a later date.</p>
-
+	<h2 id="problem">Problem</h2>
+<p>The Severless Framework <a href="https://serverless.com/framework/docs/providers/aws/guide/packaging/">package command</a> claims to be useful in CI/CD workflows. The command results in the production of AWS Cloud Formation stack json files (or alternative cloud provider equivalent) on disk. These files can be bundled and considered the &lsquo;deployment artifact&rsquo; at the end of the pipeline. The artifact can be provided to the <code>serverless deploy</code> command that could be run at a later date.</p>
 <p>This two-step package/deploy process is very familiar, so I was lured into using the <code>serverless package</code> command. However, there is a major flaw in the design!</p>
-
 <p>The behaviour of the command is to &lsquo;bake in&rsquo; the value of the expected environment variables or <a href="https://aws.amazon.com/systems-manager/features/#Parameter_Store">AWS Parameter Store</a> keys. This means your artifacts are not environment-agnostic. For example, if you include the stage parameter in the name of any functions or resources then the value of the stage parameter will be hardcoded in the artifacts. You therefore cannot promote these artifacts to any stage other than the one named when <code>serverless package</code> was called.</p>
-
 <h2 id="environment-agnostic">Environment Agnostic</h2>
-
 <p>Build artifacts are supposed to be environment-agnostic. You should be able to deploy your artifacts to any environment and &lsquo;promote&rsquo; through to production if desired. Artifacts must therefore be parameterised such that the target environment can provide everything the application needs. This is done using <a href="https://12factor.net/config">environment variables</a>. The only &lsquo;static&rsquo; value in the artifact should be the version number, provided at build time.</p>
-
 <p>One option to side-step this problem is to perform the package step once per potential target environment. A deployment would require the versioned artifacts for the target environment. This option is cumbersome during the build phase and complicates the deploy phase. However, the main problem is the potential for the baked-in environment variables to become stale.</p>
-
 <p>Let&rsquo;s say we change the value of an environment variable after packaging for the production environment. This would require all the existing production-targeted artifacts to be rebuilt so as to bake-in the latest value. Only then are the new packages fit to be deployed. This creates CI overhead and requires consideration of how far back through artifact version history is sensible to rebuild.</p>
-
 <h2 id="just-in-time-packaging">Just-in-time Packaging</h2>
-
-<p>The only realistic option is to postpone the package step, i.e. don&rsquo;t call it explicitly. The package command is implicitly called within the deploy command (as long as the <code>--package</code> parameter is not provided). This package command deference is what happens when you call <code>serverless deploy</code> against your serverless.yml. The environment variables are baked-in &lsquo;just-in-time&rsquo; so the artifacts are fit for the target environment.</p>
-
-<p>We need to bring just-in-time packaging to CI in order to produce environment-agnostic build artifacts. The simple solution is to bundle the serverless.yml file into the artifact. The deployment tooling must then execute the serverless deploy command against the bundled serverless.yml.</p>
-
-<p>In order to make the bundle completely self-contained the package.json file is also required alongside the serverless.yml. You could include your node_modules folder, or simply your package-lock.json or yarn.lock file and include a call to restore packages before <code>serverless deploy</code> is called, as shown below:</p>
-
+<p>The only realistic option is to postpone the package step, i.e. don&rsquo;t call <code>serverless package</code> explicitly. The package command is implicitly called within the deploy command (as long as the <code>--package</code> parameter is not provided). This package command deference is what happens when you call <code>serverless deploy</code> against your serverless.yml. The environment variables are baked-in &lsquo;just-in-time&rsquo; so the artifacts are fit for the target environment.</p>
+<p>We need to bring just-in-time packaging to CI to produce environment-agnostic build artifacts. The solution is to neglect the <code>serverless package</code> command and include the serverless.yml file into the build artifact. The deployment tooling must then execute the <code>serverless deploy</code> command against the serverless.yml from within the artifact sometime later.</p>
+<p>To make the bundle completely self-contained the <code>package.json</code> file is also required alongside the serverless.yml. You could include your node_modules folder, or simply your <code>package-lock.json</code> or <code>yarn.lock</code> file and include a call to restore packages before <code>serverless deploy</code> is called, as shown below:</p>
 <p>Build artifact contents</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ tree ./deploy
 .
 ├── package.json
-├── package.zip <span class="c1"># code bundle
-</span><span class="c1"></span>├── serverless.yml
-└── yarn.lock</code></pre></div>
-<p>Serverless.yml package snippet</p>
-<div class="highlight"><pre class="chroma"><code class="language-yml" data-lang="yml">package<span class="p">:</span><span class="w">
-</span><span class="w">  </span>artifact<span class="p">:</span><span class="w"> </span>package.zip</code></pre></div>
-<p>Deployment steps</p>
+├── package.zip <span class="c1"># code bundle</span>
+├── serverless.yml
+└── yarn.lock
+</code></pre></div><p>Serverless.yml package snippet</p>
+<div class="highlight"><pre class="chroma"><code class="language-yml" data-lang="yml"><span class="k">package</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="k">artifact</span><span class="p">:</span><span class="w"> </span>package.zip<span class="w">
+</span></code></pre></div><p>Deployment steps</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ <span class="nb">cd</span> ./deploy
 $ yarn install
-$ yarn run serverless deploy --stage production</code></pre></div>
+$ yarn run serverless deploy --stage prod
+</code></pre></div>
 </article>
 <nav class="no-print post-nav">
 

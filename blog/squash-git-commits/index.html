@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="generator" content="Hugo 0.49.2" />
+		<meta name="generator" content="Hugo 0.66.0" />
 		<title>Squash Git Commits - Tech Nick</title>
 
 		<meta name="description" content="Ever made several commits on a feature branch and needed to rebase? Rebasing multiple commits can be tedious if there is a conflict from an early commit, requiring a commit resolution in every commit that follows. It can be practical, therefore, to squash multiple commits into a single commit before rebasing.
@@ -74,15 +74,11 @@ Ever wanted to clean up your commit history before pushing? I often make quick c
 <hr class="sep" />
 </header>
 	<p>Ever made several commits on a feature branch and needed to rebase? Rebasing multiple commits can be tedious if there is a conflict from an early commit, requiring a commit resolution in every commit that follows. It can be practical, therefore, to squash multiple commits into a single commit before rebasing.</p>
-
 <p>Ever wanted to clean up your commit history before pushing? I often make quick commits if I&rsquo;m required to switch branches, or spiking an idea during development that ends up being permanent. I&rsquo;m left with messy commit messages that rarely follow <a href="https://chris.beams.io/posts/git-commit/">best practice</a>. Squashing commits to the rescue again! I can then take the time to carefully construct a commit message.</p>
-
 <p>I will be using the oh-my-zsh aliases in this example below</p>
-
 <blockquote>
 <p>Required: Z-Shell &amp; <a href="https://ohmyz.sh/">oh-my-zsh</a></p>
 </blockquote>
-
 <pre><code>$ glo
 5fe9acf97 done
 5306d9b9f Vevert 'try out a fix'
@@ -91,42 +87,24 @@ ef8bb3f49 try out a fix
 471bd09c1 wip
 895143a59 start the work
 2b2a51e70 (HEAD -&gt; master, origin/master, origin/HEAD) Refactor layout
-</code></pre>
-
-<p>As you can see, the commit history is a mess. Let&rsquo;s squash all the commits since the <em>head</em> of local master into one commit.</p>
-
+</code></pre><p>As you can see, the commit history is a mess. Let&rsquo;s squash all the commits since the <em>head</em> of local master into one commit.</p>
 <p>First, reset your work to the commit before your work started, identified by the hash.</p>
-
 <pre><code>$ git reset 2b2a51e70
-</code></pre>
-
-<p>Notice your changes are still on disk but git only sees them as unstaged changes - your ugly commits have disappeared.</p>
-
+</code></pre><p>Notice your changes are still on disk but git only sees them as unstaged changes - your ugly commits have disappeared.</p>
 <pre><code>$ gst
-</code></pre>
-
-<p>Now we can commit with a more thoughtful commit message.</p>
-
+</code></pre><p>Now we can commit with a more thoughtful commit message.</p>
 <pre><code>$ gaa
 $ gcam &quot;Add feature x...&quot;
-</code></pre>
-
-<p>Now we&rsquo;re in a position to rebase as the impact of a potential conflict has been reduced. Update your local copy of all remote branches and rebase on master.</p>
-
+</code></pre><p>Now we&rsquo;re in a position to rebase as the impact of a potential conflict has been reduced. Update your local copy of all remote branches and rebase on master.</p>
 <pre><code>$ gfo
 $ grb origin/master
-</code></pre>
-
-<p>Resolve any conflicts using your editor then continue the rebase.</p>
-
+</code></pre><p>Resolve any conflicts using your editor then continue the rebase.</p>
 <pre><code>$ gaa
 $ grbc
-</code></pre>
-
-<p>Confirm the history is as you expect, then push!</p>
+</code></pre><p>Confirm the history is as you expect, then push!</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ gst
-$ gp -f # or use gpsup <span class="k">if</span> the branch has not been pushed before</code></pre></div>
-<blockquote>
+$ gp -f <span class="c1"># or use gpsup if the branch has not been pushed before</span>
+</code></pre></div><blockquote>
 <p>For a list of aliases, simply use the command: <code>alias</code></p>
 </blockquote>
 
