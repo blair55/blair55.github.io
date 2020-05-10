@@ -6,10 +6,19 @@
     <description>Recent content in Blog on Tech Nick</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
-    <lastBuildDate>Fri, 29 Nov 2019 10:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 10 May 2020 11:04:23 +0100</lastBuildDate>
     
 	<atom:link href="https://blair55.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Integration testing a locally hosted serverless project</title>
+      <link>https://blair55.github.io/blog/serverless-integration-testing/</link>
+      <pubDate>Sun, 10 May 2020 11:04:23 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/blog/serverless-integration-testing/</guid>
+      <description>Strategy There are many choices for running integration/functional/e2e tests with a serverless project. There are two main modes of operation for integration testing. The first is cloud-hosted infrastructure in which a temporary copy of the stack is deployed and the intregration tests are pointed at the resources. This has the benefit of increasing the scope of the integration tests to include permissions and configuration. The door is also open for security or load testing, as the target environment is almost identical to what production will be.</description>
+    </item>
     
     <item>
       <title>A functional wrapper around the .net AWS DynamoDB SDK</title>

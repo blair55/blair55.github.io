@@ -6,7 +6,7 @@
     <description>Recent content in Tags on Tech Nick</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
-    <lastBuildDate>Fri, 29 Nov 2019 10:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 10 May 2020 11:04:23 +0100</lastBuildDate>
     
 	<atom:link href="https://blair55.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,9 +14,54 @@
     <item>
       <title>aws</title>
       <link>https://blair55.github.io/tags/aws/</link>
-      <pubDate>Fri, 29 Nov 2019 10:00:00 +0000</pubDate>
+      <pubDate>Sun, 10 May 2020 11:04:23 +0100</pubDate>
       
       <guid>https://blair55.github.io/tags/aws/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>integration-testing</title>
+      <link>https://blair55.github.io/tags/integration-testing/</link>
+      <pubDate>Sun, 10 May 2020 11:04:23 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/integration-testing/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>mocking</title>
+      <link>https://blair55.github.io/tags/mocking/</link>
+      <pubDate>Sun, 10 May 2020 11:04:23 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/mocking/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>npm</title>
+      <link>https://blair55.github.io/tags/npm/</link>
+      <pubDate>Sun, 10 May 2020 11:04:23 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/npm/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>npm-scripts</title>
+      <link>https://blair55.github.io/tags/npm-scripts/</link>
+      <pubDate>Sun, 10 May 2020 11:04:23 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/npm-scripts/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>serverless</title>
+      <link>https://blair55.github.io/tags/serverless/</link>
+      <pubDate>Sun, 10 May 2020 11:04:23 +0100</pubDate>
+      
+      <guid>https://blair55.github.io/tags/serverless/</guid>
       <description></description>
     </item>
     
@@ -71,15 +116,6 @@
       <pubDate>Mon, 01 Apr 2019 11:36:05 +0100</pubDate>
       
       <guid>https://blair55.github.io/tags/parameter-store/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>serverless</title>
-      <link>https://blair55.github.io/tags/serverless/</link>
-      <pubDate>Mon, 01 Apr 2019 11:36:05 +0100</pubDate>
-      
-      <guid>https://blair55.github.io/tags/serverless/</guid>
       <description></description>
     </item>
     

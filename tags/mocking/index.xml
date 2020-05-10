@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>serverless on Tech Nick</title>
-    <link>https://blair55.github.io/tags/serverless/</link>
-    <description>Recent content in serverless on Tech Nick</description>
+    <title>mocking on Tech Nick</title>
+    <link>https://blair55.github.io/tags/mocking/</link>
+    <description>Recent content in mocking on Tech Nick</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>&amp;copy; 2018 Nicholas Blair</copyright>
     <lastBuildDate>Sun, 10 May 2020 11:04:23 +0100</lastBuildDate>
     
-	<atom:link href="https://blair55.github.io/tags/serverless/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://blair55.github.io/tags/mocking/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -18,16 +18,6 @@
       
       <guid>https://blair55.github.io/blog/serverless-integration-testing/</guid>
       <description>Strategy There are many choices for running integration/functional/e2e tests with a serverless project. There are two main modes of operation for integration testing. The first is cloud-hosted infrastructure in which a temporary copy of the stack is deployed and the intregration tests are pointed at the resources. This has the benefit of increasing the scope of the integration tests to include permissions and configuration. The door is also open for security or load testing, as the target environment is almost identical to what production will be.</description>
-    </item>
-    
-    <item>
-      <title>Serverless package done right</title>
-      <link>https://blair55.github.io/blog/serverless-package-done-right/</link>
-      <pubDate>Mon, 01 Apr 2019 11:36:05 +0100</pubDate>
-      
-      <guid>https://blair55.github.io/blog/serverless-package-done-right/</guid>
-      <description>Problem The Severless Framework package command claims to be useful in CI/CD workflows. The command results in the production of AWS Cloud Formation stack json files (or alternative cloud provider equivalent) on disk. These files can be bundled and considered the &amp;lsquo;deployment artifact&amp;rsquo; at the end of the pipeline. The artifact can be provided to the serverless deploy command that could be run at a later date.
-This two-step package/deploy process is very familiar, so I was lured into using the serverless package command.</description>
     </item>
     
   </channel>
