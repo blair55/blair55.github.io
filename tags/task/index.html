@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.152.2"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark"><meta name="description" content="Nick talks tech"><title>Task&nbsp;&ndash;&nbsp;Tech Nick</title><link rel="stylesheet" href="/css/core.min.952a6d39cb50fac3eaa9e4386dd02bf0c2457e47928bc76ee18de871a100fec5835856656a5dc80bd4fb6f951cc004f3.css" integrity="sha384-lSptOctQ&#43;sPqqeQ4bdAr8MJFfkeSi8du4Y3ocaEA/sWDWFZlal3IC9T7b5UcwATz"><link rel="alternate" type="application/rss+xml" href="/tags/task/index.xml" title="Tech Nick" /><meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Task" /><body><section id="header">
+    <div class="header wrap"><span class="header left-side"><a class="site home" href="/"><span class="site name">Tech Nick</span></a></span>
+        <span class="header right-side"><div class="nav wrap"><nav class="nav"><a class="nav item" href="https://nickblair%2edev/"target="_blank" rel="noopener noreferrer">About</a></nav></div></span></div></section><section id="content"><section class="article header"><h1>Task</h1></section><ul class="note list"><li class="item">
+        
+        <a class="note" href="/blog/parallel-hetero-async/">
+        
+            <p class="note title">Parallelising Heterogeneous Async Calls</p><p class="note date">2025-12-04</p><p class="note content">This is a post for the FSharp Advent Calendar 2025.
+A particular feature of F# 10 got me thinking about approaches to parallelism, past and present.
+Async.Parallel This system library function is built for orchestrating async calls with homogenous return types. It has an overload that permits controlling the degree of parallelism.
+static member Parallel: computations: seq&lt;Async&lt;&#39;T&gt;&gt; -&gt; Async&lt;&#39;T array&gt; It&rsquo;s great for situations where we want to make multiple calls to the same api endpoint with different arguments - because each call expects the same response, we end up with a collection of the response type when all the calls are complete. And given the calls are made in parallel, we might only have to wait as long as the longest call.
+<span class="mldr">&mldr;</span></p></a><p class="note labels"><a class="tag" href="/tags/fsharp/">fsharp</a><a class="tag" href="/tags/parallelism/">parallelism</a><a class="tag" href="/tags/concurrency/">concurrency</a><a class="tag" href="/tags/async/">async</a><a class="tag" href="/tags/task/">task</a></p></li></ul></section><section id="footer"><div class="footer-wrap">
+    <p class="copyright">Tech Nick</p>
+    <p class="powerby"><span>Powered&nbsp;by&nbsp;</span><a href="https://gohugo.io" 
+        target="_blank" rel="noopener noreferrer">Hugo</a><span>&nbsp;&amp;&nbsp;</span><a href="https://themes.gohugo.io/hugo-notepadium/" 
+        target="_blank" rel="noopener noreferrer">Notepadium</a></p></div></section></body>
+
+</html>

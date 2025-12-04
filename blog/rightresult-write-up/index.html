@@ -1,96 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="generator" content="Hugo 0.66.0" />
-		<title>RightResult Write Up - Tech Nick</title>
+<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.152.2"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark"><meta name="description" content="
+About the design
 
-		<meta name="description" content="About the design  What problem inspired this work? RightResult is the SAAS incarnation of a game my friend would coordinate via emails and a spreadsheet.
-Each week, he would email game members requesting predictions for the weekend&rsquo;s English Premier League fixtures. Predictions and fixture results were entered into a spreadsheet. The scores would be tallied-up and communicated back to members. The winner was who had predicted most accurately.">
-
-
-		
-		
-		
-		<link rel="stylesheet" href="/css/ui.min.css"/>
-		
-		
-		
-
-		<link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono|Lato|Raleway">
-
-		
-
-		<style>
-	a { color: #ff8181; }
-	blockquote {
-		border-left-color: #ff8181;
-		border-right-color: #ff8181; }
-	.bar a:hover {
-		color: #ff8181;
-		text-decoration: none; }
-	.sep {
-		margin-top: 2rem;
-		margin-bottom: 1rem;
-		margin-left:0;
-		width: 24rem;
-		border-top: 2px solid #ff8181; }
-</style>
-
-	</head>
-
-<body>
-<header class="container no-print">
-	<div class="u-header">
-		<nav class="bar">
-	<ul><li>
-			<a href="/">
-				<img class="icon-text" src="/img/prev.svg"/>
-			</a>
-		</li></ul>
-</nav>
-
-	</div>
-</header>
-<main class="container">
-
-<article>
-	<header><hgroup id="brand">
-	<h1>RightResult Write Up</h1>
-	<h5>
-		
-		<time datetime="2021-04-13 00:42:14 &#43;0100 BST">Apr 13, 2021</time>
-		<span class="no-print">
-			-
-				
-				<a href="/tags/elm">elm</a>
-				
-				<a href="/tags/elmish">elmish</a>
-				
-				<a href="/tags/event-driven">event-driven</a>
-				
-				<a href="/tags/event%20store">event store</a>
-				
-				<a href="/tags/fable">fable</a>
-				
-				<a href="/tags/fsharp">fsharp</a>
-				
-				<a href="/tags/neo4j">neo4j</a>
-				<span>
-	</h5>
-	
-</hgroup>
-<hr class="sep" />
-</header>
-	<hr>
+What problem inspired this work?
+RightResult is the SAAS incarnation of a game my friend would coordinate via emails and a spreadsheet.
+Each week, he would email game members requesting predictions for the weekend&rsquo;s English Premier League fixtures. Predictions and fixture results were entered into a spreadsheet. The scores would be tallied-up and communicated back to members. The winner was who had predicted most accurately.
+I built a product to ease the coordination burden and improve the experience for members. It also serves as a technical laboratory with real challenges."><title>RightResult Write Up&nbsp;&ndash;&nbsp;Tech Nick</title><link rel="stylesheet" href="/css/core.min.952a6d39cb50fac3eaa9e4386dd02bf0c2457e47928bc76ee18de871a100fec5835856656a5dc80bd4fb6f951cc004f3.css" integrity="sha384-lSptOctQ&#43;sPqqeQ4bdAr8MJFfkeSi8du4Y3ocaEA/sWDWFZlal3IC9T7b5UcwATz"><meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="RightResult Write Up" /><body><section id="header">
+    <div class="header wrap"><span class="header left-side"><a class="site home" href="/"><span class="site name">Tech Nick</span></a></span>
+        <span class="header right-side"><div class="nav wrap"><nav class="nav"><a class="nav item" href="https://nickblair%2edev/"target="_blank" rel="noopener noreferrer">About</a></nav></div></span></div></section><section id="content"><div class="article-container"><section class="article header">
+    <h1 class="article title">RightResult Write Up</h1><p class="article date">2021-04-13</p></section><article class="article markdown-body"><hr>
 <h2 id="about-the-design">About the design</h2>
 <hr>
 <h3 id="what-problem-inspired-this-work">What problem inspired this work?</h3>
-<p><a href="https://rightresu.lt">RightResult</a> is the SAAS incarnation of a game my friend would coordinate via emails and a spreadsheet.</p>
+<p><a href="https://rightresu.lt"target="_blank" rel="noopener noreferrer">RightResult</a> is the SAAS incarnation of a game my friend would coordinate via emails and a spreadsheet.</p>
 <p>Each week, he would email game members requesting predictions for the weekend&rsquo;s English Premier League fixtures. Predictions and fixture results were entered into a spreadsheet. The scores would be tallied-up and communicated back to members. The winner was who had predicted most accurately.</p>
 <p>I built a product to ease the coordination burden and improve the experience for members. It also serves as a technical laboratory with real challenges.</p>
-<p>Emphasized links refer to <em><a href="https://github.com/blair55/rightresult">source code</a></em>.</p>
+<p>Emphasized links refer to <em><a href="https://github.com/blair55/rightresult"target="_blank" rel="noopener noreferrer">source code</a></em>.</p>
 <hr>
 <h3 id="what-is-your-solutions-approach">What is your solution&rsquo;s approach?</h3>
 <p>RightResult automates-away most of the game coordination responsibilities. The application sources the weekly fixtures and follows up with the results. This reduces the human effort and improves reliability.</p>
@@ -100,7 +28,7 @@ Each week, he would email game members requesting predictions for the weekend&rs
 <p>The application supports push notifications on supported platforms. Subscribed members are informed when new fixtures are added. My friend continues to announce winners by email which preserves a sense of community.</p>
 <hr>
 <h3 id="how-is-your-solution-used">How is your solution used?</h3>
-<p>Please enjoy the <a href="https://www.loom.com/share/512a0cd2f3ce4a4c9ba2bd4e5b6b6784">walkthrough video</a>!</p>
+<p>Please enjoy the <a href="https://www.loom.com/share/512a0cd2f3ce4a4c9ba2bd4e5b6b6784"target="_blank" rel="noopener noreferrer">walkthrough video</a>!</p>
 <hr>
 <h3 id="what-forces-were-you-designing-for">What forces were you designing for?</h3>
 <p>The priorities were clear because my friends and I were members of the original game. The driving force was the desire to reduce burden and modernise the experience. There was little doubt that a web-based product would bring these benefits. As I was willing to pay development costs with my own time, there was no downside to consider.</p>
@@ -109,35 +37,36 @@ Each week, he would email game members requesting predictions for the weekend&rs
 <p>The latest iteration improves on maintainability with the choice to use F#. The power of the type system is leveraged throughout the stack. I have confidence in changes even when the domain is not fresh in my mind. The response time remains low throughout the season because each view is eagerly-evaluated. This is discussed further in the architecture section.</p>
 <hr>
 <h3 id="what-alternatives-did-you-consider">What alternatives did you consider?</h3>
-<p>I was curious about graph databases. The second iteration of RightResult allowed me to solve a real problem with graph technology. I used <a href="https://neo4j.com/">Neo4j</a> to persist relationships between members and private leagues. I took the time to up-skill and satisfy my curiosity. On reflection, the choice has not added significant value to the product. Although, there is value in the experience gained learning any new technology.</p>
+<p>I was curious about graph databases. The second iteration of RightResult allowed me to solve a real problem with graph technology. I used <a href="https://neo4j.com/"target="_blank" rel="noopener noreferrer">Neo4j</a> to persist relationships between members and private leagues. I took the time to up-skill and satisfy my curiosity. On reflection, the choice has not added significant value to the product. Although, there is value in the experience gained learning any new technology.</p>
 <p>Graph databases are powerful in a relationship-rich domain. The potential to gain insight grows with the number of distinct relationship types. The member/league relationship is naturally shallow so there is little explorative potential. A simpler alternative would have been a relational database like MySql or Postgres. The time spent up-skilling represents lost opportunity-cost.</p>
 <hr>
 <h2 id="about-the-implementation">About the implementation</h2>
 <hr>
 <h3 id="how-is-your-solution-architected">How is your solution architected?</h3>
-<p>At the code-level, RightResult is based on the <a href="https://safe-stack.github.io/">SAFE stack</a> application model. This means F# is used on the frontend and backend. I used <a href="https://zaid-ajaj.github.io/Fable.Remoting/">Fable.Remoting</a> to share a <em><a href="https://github.com/blair55/rightresult/blob/master/src/Server/Events.fs">domain model</a></em> across the both client and server applications. This maximises compiler support.</p>
+<p>At the code-level, RightResult is based on the <a href="https://safe-stack.github.io/"target="_blank" rel="noopener noreferrer">SAFE stack</a> application model. This means F# is used on the frontend and backend. I used <a href="https://zaid-ajaj.github.io/Fable.Remoting/"target="_blank" rel="noopener noreferrer">Fable.Remoting</a> to share a <em><a href="https://github.com/blair55/rightresult/blob/master/src/Server/Events.fs"target="_blank" rel="noopener noreferrer">domain model</a></em> across the both client and server applications. This maximises compiler support.</p>
 <p>Both client and server are event-driven applications, though the implementations differ.</p>
-<p>The client application uses the <a href="https://elmish.github.io/">Elmish</a> framework. This delivers the design pattern at the core of the Elm programming language. User interactions are modelled as commands that may produce events. Events are the only way that application state can be changed. All possible events are defined with a <em><a href="https://github.com/blair55/rightresult/blob/master/src/Client/Areas/Fixtures/OmniFixtures.fs/#L42-L55">union type</a></em> so can be evaluated with a pattern match expression.</p>
+<p>The client application uses the <a href="https://elmish.github.io/"target="_blank" rel="noopener noreferrer">Elmish</a> framework. This delivers the design pattern at the core of the Elm programming language. User interactions are modelled as commands that may produce events. Events are the only way that application state can be changed. All possible events are defined with a <em><a href="https://github.com/blair55/rightresult/blob/master/src/Client/Areas/Fixtures/OmniFixtures.fs/#L42-L55"target="_blank" rel="noopener noreferrer">union type</a></em> so can be evaluated with a pattern match expression.</p>
 <p>An example input command is &lsquo;Decrement Score&rsquo;. The output would be a &lsquo;Score Decremented&rsquo; event if the state holds a score greater than zero. Otherwise, no events are returned. This highlights when input is validated, and is summarised by the following signature.</p>
-<pre><code>(command * state) -&gt; event list
-</code></pre><p>Next, the elmish framework calls a <em><a href="https://github.com/blair55/rightresult/blob/master/src/Client/Areas/Leagues/LeagueHistory.fs/#L145-L157">function</a></em> to apply the state change caused by the event. The &lsquo;Score Decremented&rsquo; event will cause the score in the application state to reduce by one. The output of the function is the updated application state.</p>
-<pre><code>(event * state) -&gt; state
-</code></pre><p>The state is used to render the view using a <em><a href="https://github.com/blair55/rightresult/blob/master/src/Client/Areas/Leagues/CreateLeague.fs/#L43-L61">function</a></em> provided to the elmish framework. This continuous, iterative application of event-to-state constitutes the <a href="https://guide.elm-lang.org/architecture/">Model View Update pattern</a> (MVU). It can be thought of as the <a href="https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-listmodule.html#fold">fold function</a> at the application-level. Each step is pure, causing no side-effects and requiring <a href="https://henrikeichenhardt.blogspot.com/2013/06/why-shared-mutable-state-is-root-of-all.html">no shared state</a>.</p>
-<p>The event-driven aspect of the server application is provided by <a href="https://www.eventstore.com/">Event Store</a>. This is a database designed for storing and replaying events. As with the client, input commands received by the server are validated and may produce events. Events committed to Event Store are immutable and persisted permanently. The application is also subscribed to the database such that new events can be acted on.</p>
-<p>Like the client, the server application reacts to <em><a href="https://github.com/blair55/rightresult/blob/master/src/Server/Events.fs">events</a></em> by updating its state. Application state is managed with two mutable storage approaches. The first uses Neo4j to persist the relationships between members and leagues. The second uses in-memory <a href="https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-mapmodule.html">maps</a> to hold league tables and members&rsquo; performance metrics. When the server application starts it destroys the data stored in Neo4j. Naturally, the in-memory storage is empty on start up. The application asks the database to replay all events in-order from the beginning. Each event is handled according to application logic and applied to the current state. The output is captured in mutable storage and so rehydrates application state. Once the application has replayed all existing events it remains subscribed for new ones.</p>
+<pre tabindex="0"><code>(command * state) -&gt; event list
+</code></pre><p>Next, the elmish framework calls a <em><a href="https://github.com/blair55/rightresult/blob/master/src/Client/Areas/Leagues/LeagueHistory.fs/#L145-L157"target="_blank" rel="noopener noreferrer">function</a></em> to apply the state change caused by the event. The &lsquo;Score Decremented&rsquo; event will cause the score in the application state to reduce by one. The output of the function is the updated application state.</p>
+<pre tabindex="0"><code>(event * state) -&gt; state
+</code></pre><p>The state is used to render the view using a <em><a href="https://github.com/blair55/rightresult/blob/master/src/Client/Areas/Leagues/CreateLeague.fs/#L43-L61"target="_blank" rel="noopener noreferrer">function</a></em> provided to the elmish framework. This continuous, iterative application of event-to-state constitutes the <a href="https://guide.elm-lang.org/architecture/"target="_blank" rel="noopener noreferrer">Model View Update pattern</a> (MVU). It can be thought of as the <a href="https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-listmodule.html#fold"target="_blank" rel="noopener noreferrer">fold function</a> at the application-level. Each step is pure, causing no side-effects and requiring <a href="https://henrikeichenhardt.blogspot.com/2013/06/why-shared-mutable-state-is-root-of-all.html"target="_blank" rel="noopener noreferrer">no shared state</a>.</p>
+<p>The event-driven aspect of the server application is provided by <a href="https://www.eventstore.com/"target="_blank" rel="noopener noreferrer">Event Store</a>. This is a database designed for storing and replaying events. As with the client, input commands received by the server are validated and may produce events. Events committed to Event Store are immutable and persisted permanently. The application is also subscribed to the database such that new events can be acted on.</p>
+<p>Like the client, the server application reacts to <em><a href="https://github.com/blair55/rightresult/blob/master/src/Server/Events.fs"target="_blank" rel="noopener noreferrer">events</a></em> by updating its state. Application state is managed with two mutable storage approaches. The first uses Neo4j to persist the relationships between members and leagues. The second uses in-memory <a href="https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-mapmodule.html"target="_blank" rel="noopener noreferrer">maps</a> to hold league tables and members&rsquo; performance metrics. When the server application starts it destroys the data stored in Neo4j. Naturally, the in-memory storage is empty on start up. The application asks the database to replay all events in-order from the beginning. Each event is handled according to application logic and applied to the current state. The output is captured in mutable storage and so rehydrates application state. Once the application has replayed all existing events it remains subscribed for new ones.</p>
 <p>An example of a server application event is &lsquo;Fixture Classified&rsquo;. This is when the application sources the result of a fixture. The application reacts to this event by comparing the result to the predictions. The score for each members&rsquo; prediction is applied to each league the member belongs to. League tables are updated in-memory. Members&rsquo; performance metrics are also recalculated and captured. In this way, all tabular views in the application are eagerly-evaluated. The data is always available at rest and ready to serve on request. This improves response time as mentioned in the quality attributes section.</p>
-<p>Traffic volume is low enough that the entire application can be hosted on a single Digital Ocean <a href="https://docs.digitalocean.com/products/droplets/">droplet</a> (virtual machine). Nginx hosts the TLS certificate. The server application, proxy, and database components are provisioned using <a href="https://docs.docker.com/compose/">docker-compose</a>. The Event Store container is configured with a volume so events are persisted to disk. The diagram below is scoped to the component level of architecture.</p>
-<p><img src="architecture.png" alt="architecture"></p>
+<p>Traffic volume is low enough that the entire application can be hosted on a single Digital Ocean <a href="https://docs.digitalocean.com/products/droplets/"target="_blank" rel="noopener noreferrer">droplet</a> (virtual machine). Nginx hosts the TLS certificate. The server application, proxy, and database components are provisioned using <a href="https://docs.docker.com/compose/"target="_blank" rel="noopener noreferrer">docker-compose</a>. The Event Store container is configured with a volume so events are persisted to disk. The diagram below is scoped to the component level of architecture.</p>
+<p><img loading="lazy"  src="architecture.png"
+        alt="architecture"/></p>
 <hr>
 <h3 id="whats-a-compromise-you-had-to-make">What&rsquo;s a compromise you had to make?</h3>
 <p>The single-instance hosting approach is one giant trade-off. The application will not scale if a traffic spike occurred. However, rearchitecting for scalability would be expensive. The risk of increased traffic is low, and the audience is not globally distributed. This is therefore an acceptable compromise for now.</p>
-<p>Background-tasks such as result fetching are coupled to the web application. Tasks are scheduled using a <em><a href="https://github.com/blair55/rightresult/blob/master/src/Server/Server.fs/#L510-L514">timeout</a></em> running inside a <a href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-5.0&amp;tabs=visual-studio">hosted service</a>. A preferable solution would be to break-out the background tasks into containers. They would operate at the same level, and have a sibling relationship with the web application rather than a parent/child one. Independently managed tasks would decouple the concepts and reduce resource contention. This code-level compromise saved development time and keeps the packaging process simple.</p>
+<p>Background-tasks such as result fetching are coupled to the web application. Tasks are scheduled using a <em><a href="https://github.com/blair55/rightresult/blob/master/src/Server/Server.fs/#L510-L514"target="_blank" rel="noopener noreferrer">timeout</a></em> running inside a <a href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-5.0&amp;tabs=visual-studio"target="_blank" rel="noopener noreferrer">hosted service</a>. A preferable solution would be to break-out the background tasks into containers. They would operate at the same level, and have a sibling relationship with the web application rather than a parent/child one. Independently managed tasks would decouple the concepts and reduce resource contention. This code-level compromise saved development time and keeps the packaging process simple.</p>
 <hr>
 <h3 id="how-would-you-spend-a-week-developing-further">How would you spend a week developing further?</h3>
 <p>I would add value by developing game features. A live-score feature would supplement the UI for in-play fixtures. Members have also suggested richer rules to support more ways to award points for each fixture. The event stream could be replayed against the new rules to observe the effect on historic winners.</p>
 <p>I would like to further <em>gamify</em> the product by celebrating achievements. Historic winners could be decorated with badges. This could also be applied retrospectively by replaying events. The challenge is to curate a suitable set of awards.</p>
-<p>I would like to automate the <a href="https://letsencrypt.org/">Let&rsquo;s Encrypt</a> certificate renewal to reduce operational overhead. The next iteration of RightResult will be built using serverless technology such as <a href="https://aws.amazon.com/lambda/">AWS lambda</a>. This will further reduce running costs and increase scalability.</p>
-<p>If the question was &ldquo;what would you do with a team of engineers?&rdquo; then my priorities would be different. The <em><a href="https://github.com/blair55/rightresult/blob/master/.github/workflows/publish.yml">continuous integration</a></em> pipeline would be enhanced with more tests. Effort would be invested in developer workflow to improve productivity. Test-data generation and temporary stack support would aid issue-reproduction.</p>
+<p>I would like to automate the <a href="https://letsencrypt.org/"target="_blank" rel="noopener noreferrer">Let&rsquo;s Encrypt</a> certificate renewal to reduce operational overhead. The next iteration of RightResult will be built using serverless technology such as <a href="https://aws.amazon.com/lambda/"target="_blank" rel="noopener noreferrer">AWS lambda</a>. This will further reduce running costs and increase scalability.</p>
+<p>If the question was &ldquo;what would you do with a team of engineers?&rdquo; then my priorities would be different. The <em><a href="https://github.com/blair55/rightresult/blob/master/.github/workflows/publish.yml"target="_blank" rel="noopener noreferrer">continuous integration</a></em> pipeline would be enhanced with more tests. Effort would be invested in developer workflow to improve productivity. Test-data generation and temporary stack support would aid issue-reproduction.</p>
 <hr>
 <h3 id="what-would-you-have-done-with-a-week-less">What would you have done with a week less?</h3>
 <p>Push notifications were most recently added to the application. This non-core feature was not required for launch.</p>
@@ -150,57 +79,13 @@ Each week, he would email game members requesting predictions for the weekend&rs
 <p>Many of my friends are members of the game. We have candid conversations about the suitability of existing features and the priority of new ones. Qualitative feedback from beyond my circle of friends comes via social media. The email channel also receives suggestions and bug reports. I experimented with a feedback form in the application but gained little insight.</p>
 <p>The Neo4j database allows for quantitive analysis. However, the answers to questions like &ldquo;how many members are in more than one league with the same member&rdquo; are worth little with a low sample-size. Off-the-shelf analytics platforms would be excessive solutions for the same reason. I will think critically about the questions I want to answer when the product matures. The strategic objectives and velocity could be measured empirically. For now, it remains a hobby that helps to bind a group of friends.</p>
 <hr>
-
-</article>
-<nav class="no-print post-nav">
-
-	<a class="prev-post" href="https://blair55.github.io/blog/serverless-integration-testing/">
-		<img class="icon-text" src="/img/prev.svg"/>Integration testing a locally hosted serverless project</a>
-
-
-</nav>
-
-
-<section id="related">
-  <h4>See Also</h4>
-  <ul>
-    
-  	<li><a href="/blog/dynamodb-functional-wrapper/">A functional wrapper around the .net AWS DynamoDB SDK</a></li>
-  	
-  	<li><a href="/blog/combining-monads/">Combining monads</a></li>
-  	
-  	<li><a href="/blog/aws-parameter-store-scripting/">Scripting with AWS Parameter Store</a></li>
-  	
-  </ul>
+</article><section class="article labels"><a class="tag" href=/tags/elm/>elm</a><a class="tag" href=/tags/elmish/>elmish</a><a class="tag" href=/tags/event-driven/>event-driven</a><a class="tag" href=/tags/event-store/>event store</a><a class="tag" href=/tags/fable/>fable</a><a class="tag" href=/tags/fsharp/>fsharp</a><a class="tag" href=/tags/neo4j/>neo4j</a></section><section class="article author"><img alt="" loading="lazy" class="avatar" src="/img/avatar.jpg"/><div class="details"><a class="item" href="https://github.com/blair55" target="_blank" rel="noopener noreferrer"><span class="iconfont icon-github"></span>&nbsp;blair55</a><a class="item" href="https://bsky.app/profile/nickblair.dev" target="_blank" rel="noopener noreferrer"><span class="iconfont"><img style="width: 1em; margin-bottom: -2px;" src="/img/bluesky.svg" alt="Bluesky"/></span>&nbsp;@nickblair.dev</a></div>
 </section>
+</div>
+<div class="article bottom"><section class="article navigation"><p><a class="link" href="/blog/parallel-hetero-async/"><span class="iconfont icon-article"></span>Parallelising Heterogeneous Async Calls</a></p><p><a class="link" href="/blog/serverless-integration-testing/"><span class="iconfont icon-article"></span>Integration testing a locally hosted serverless project</a></p></section></div></section><section id="footer"><div class="footer-wrap">
+    <p class="copyright">Tech Nick</p>
+    <p class="powerby"><span>Powered&nbsp;by&nbsp;</span><a href="https://gohugo.io" 
+        target="_blank" rel="noopener noreferrer">Hugo</a><span>&nbsp;&amp;&nbsp;</span><a href="https://themes.gohugo.io/hugo-notepadium/" 
+        target="_blank" rel="noopener noreferrer">Notepadium</a></p></div></section></body>
 
-
-
-			<hr class="sep" />
-		</main>
-		<footer class="container no-print">
-			<div class="u-footer">
-				
-
-<a href="https://github.com/blair55"><img class="icon-social" src="/img/github.svg" alt="Github"/></a>
-
-
-<a href="https://twitter.com/nickblair"><img class="icon-social" src="/img/twitter.svg" alt="Twitter"/></a>
-
-				<p>
-					
-					
-					
-				</p>
-				
-				<a href="#brand">
-					<img class="icon-text" src="/img/toup.svg" alt="To Up"/>
-					<span>Back to Up</span>
-				</a>
-				
-			</div>
-		</footer>
-		
-	</body>
 </html>
-

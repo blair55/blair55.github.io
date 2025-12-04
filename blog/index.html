@@ -1,149 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="generator" content="Hugo 0.66.0" />
-		<title>Blog - Tech Nick</title>
+<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.152.2"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark"><meta name="description" content="Nick talks tech"><title>Blog&nbsp;&ndash;&nbsp;Tech Nick</title><link rel="stylesheet" href="/css/core.min.952a6d39cb50fac3eaa9e4386dd02bf0c2457e47928bc76ee18de871a100fec5835856656a5dc80bd4fb6f951cc004f3.css" integrity="sha384-lSptOctQ&#43;sPqqeQ4bdAr8MJFfkeSi8du4Y3ocaEA/sWDWFZlal3IC9T7b5UcwATz"><link rel="alternate" type="application/rss+xml" href="/blog/index.xml" title="Tech Nick" /><meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Blog" /><body><section id="header">
+    <div class="header wrap"><span class="header left-side"><a class="site home" href="/"><span class="site name">Tech Nick</span></a></span>
+        <span class="header right-side"><div class="nav wrap"><nav class="nav"><a class="nav item" href="https://nickblair%2edev/"target="_blank" rel="noopener noreferrer">About</a></nav></div></span></div></section><section id="content"><section class="article header"><h1>Blog</h1></section><ul class="note list"><li class="item">
+        
+        <a class="note" href="/blog/parallel-hetero-async/">
+        
+            <p class="note title">Parallelising Heterogeneous Async Calls</p><p class="note date">2025-12-04</p><p class="note content">This is a post for the FSharp Advent Calendar 2025.
+A particular feature of F# 10 got me thinking about approaches to parallelism, past and present.
+Async.Parallel This system library function is built for orchestrating async calls with homogenous return types. It has an overload that permits controlling the degree of parallelism.
+static member Parallel: computations: seq&lt;Async&lt;&#39;T&gt;&gt; -&gt; Async&lt;&#39;T array&gt; It&rsquo;s great for situations where we want to make multiple calls to the same api endpoint with different arguments - because each call expects the same response, we end up with a collection of the response type when all the calls are complete. And given the calls are made in parallel, we might only have to wait as long as the longest call.
+<span class="mldr">&mldr;</span></p></a><p class="note labels"><a class="tag" href="/tags/fsharp/">fsharp</a><a class="tag" href="/tags/parallelism/">parallelism</a><a class="tag" href="/tags/concurrency/">concurrency</a><a class="tag" href="/tags/async/">async</a><a class="tag" href="/tags/task/">task</a></p></li><li class="item">
+        
+        <a class="note" href="/blog/rightresult-write-up/">
+        
+            <p class="note title">RightResult Write Up</p><p class="note date">2021-04-13</p><p class="note content"> About the design What problem inspired this work? RightResult is the SAAS incarnation of a game my friend would coordinate via emails and a spreadsheet.
+Each week, he would email game members requesting predictions for the weekend&rsquo;s English Premier League fixtures. Predictions and fixture results were entered into a spreadsheet. The scores would be tallied-up and communicated back to members. The winner was who had predicted most accurately.
+I built a product to ease the coordination burden and improve the experience for members. It also serves as a technical laboratory with real challenges.
+<span class="mldr">&mldr;</span></p></a><p class="note labels"><a class="tag" href="/tags/elm/">elm</a><a class="tag" href="/tags/elmish/">elmish</a><a class="tag" href="/tags/event-driven/">event-driven</a><a class="tag" href="/tags/event-store/">event store</a><a class="tag" href="/tags/fable/">fable</a><a class="tag" href="/tags/fsharp/">fsharp</a><a class="tag" href="/tags/neo4j/">neo4j</a></p></li><li class="item">
+        
+        <a class="note" href="/blog/serverless-integration-testing/">
+        
+            <p class="note title">Integration testing a locally hosted serverless project</p><p class="note date">2020-05-10</p><p class="note content">Strategy There are many choices for running integration/functional/e2e tests with a serverless project. There are two main modes of operation for integration testing. The first is cloud-hosted infrastructure in which a temporary copy of the stack is deployed and the intregration tests are pointed at the resources. This has the benefit of increasing the scope of the integration tests to include permissions and configuration. The door is also open for security or load testing, as the target environment is almost identical to what production will be. The downside of testing against cloud hosted infrastructure is that you introduce a network dependency into your stack. Your internet connection must be reliable, and your cloud host must be operational for your tests to succeed. Furthermore, the overhead in creating and tearing down stacks can be wearisom in an otherwise fast-paced development feedback loop.
+<span class="mldr">&mldr;</span></p></a><p class="note labels"><a class="tag" href="/tags/aws/">aws</a><a class="tag" href="/tags/serverless/">serverless</a><a class="tag" href="/tags/npm/">npm</a><a class="tag" href="/tags/npm-scripts/">npm-scripts</a><a class="tag" href="/tags/integration-testing/">integration-testing</a><a class="tag" href="/tags/mocking/">mocking</a></p></li><li class="item">
+        
+        <a class="note" href="/blog/dynamodb-functional-wrapper/">
+        
+            <p class="note title">A functional wrapper around the .net AWS DynamoDB SDK</p><p class="note date">2019-11-29</p><p class="note content">We&rsquo;re going to take a tour of some F# capabilities and use them to enforce the constraints of the DynamoDB client. We&rsquo;ll look at domain modeling with discriminated unions, data access using the reader applicative, and error handling with the result type.
+DynamoDB and Data Types Before we get started, let&rsquo;s summarise DynamoDB and its supported types.
+DynamoDB is a key-value &amp; document database. DynamoDB tables are schemaless so each record can contain a different number of attributes. A record attribute has a string name and a value that is one of three types: Scalar, Set, and Document. A Scalar is a single value of a particular primitive type: string, number, boolean, binary or null. Number and binary values require string conversion before being sent over the network.
+<span class="mldr">&mldr;</span></p></a><p class="note labels"><a class="tag" href="/tags/fsharp/">fsharp</a><a class="tag" href="/tags/functional/">functional</a><a class="tag" href="/tags/monads/">monads</a><a class="tag" href="/tags/aws/">aws</a><a class="tag" href="/tags/dynamodb/">dynamodb</a></p></li><li class="item">
+        
+        <a class="note" href="/blog/combining-monads/">
+        
+            <p class="note title">Combining monads</p><p class="note date">2019-08-02</p><p class="note content">The F# Result&lt;'a,'b&gt; type allows for concise control flow syntax. The async { ... } computation expression similarly minimizes the noise of asynchrony. Throw in the Writer monad for logging minus the intrinsic IO statements. How do you get the benefits of all three together? You need to combine&hellip;
+Source code gist.
+Writer The Result and Async types are core types in F# but Writer is not so we need a bit of boilerplate to get going. We define a single case union type in which the single case is parameterized with a function. The function expects a unit and returns a tuple. See this post for details.
+<span class="mldr">&mldr;</span></p></a><p class="note labels"><a class="tag" href="/tags/fsharp/">fsharp</a><a class="tag" href="/tags/functional/">functional</a><a class="tag" href="/tags/monads/">monads</a></p></li><li class="item">
+        
+        <a class="note" href="/blog/serverless-package-done-right/">
+        
+            <p class="note title">Serverless package done right</p><p class="note date">2019-04-01</p><p class="note content">Problem The Severless Framework package command claims to be useful in CI/CD workflows. The command results in the production of AWS Cloud Formation stack json files (or alternative cloud provider equivalent) on disk. These files can be bundled and considered the &lsquo;deployment artifact&rsquo; at the end of the pipeline. The artifact can be provided to the serverless deploy command that could be run at a later date.
+This two-step package/deploy process is very familiar, so I was lured into using the serverless package command. However, there is a major flaw in the design!
+<span class="mldr">&mldr;</span></p></a><p class="note labels"><a class="tag" href="/tags/aws/">aws</a><a class="tag" href="/tags/parameter-store/">parameter-store</a><a class="tag" href="/tags/serverless/">serverless</a><a class="tag" href="/tags/bash/">bash</a></p></li><li class="item">
+        
+        <a class="note" href="/blog/squash-git-commits/">
+        
+            <p class="note title">Squash Git Commits</p><p class="note date">2018-10-16</p><p class="note content">Ever made several commits on a feature branch and needed to rebase? Rebasing multiple commits can be tedious if there is a conflict from an early commit, requiring a commit resolution in every commit that follows. It can be practical, therefore, to squash multiple commits into a single commit before rebasing.
+Ever wanted to clean up your commit history before pushing? I often make quick commits if I&rsquo;m required to switch branches, or spiking an idea during development that ends up being permanent. I&rsquo;m left with messy commit messages that rarely follow best practice. Squashing commits to the rescue again! I can then take the time to carefully construct a commit message.
+<span class="mldr">&mldr;</span></p></a><p class="note labels"><a class="tag" href="/tags/git/">git</a><a class="tag" href="/tags/zsh/">zsh</a></p></li><li class="item">
+        
+        <a class="note" href="/blog/aws-parameter-store-scripting/">
+        
+            <p class="note title">Scripting with AWS Parameter Store</p><p class="note date">2018-10-12</p><p class="note content">Ever need to write a short script as part of development to get feedback on a portion of code? Ever need to add private authentication values to that script? Ever wanted to add the script to source control but couldn&rsquo;t because it contained your private authentication?
+Enter: AWS Parameter Store
+This AWS service acts as a key-value store. Add your private settings such as usernames, passwords, connection strings etc and they can be retrieved programatically by their key name. This lets you commit your handy script to source control by keeping it free from private values.
+<span class="mldr">&mldr;</span></p></a><p class="note labels"><a class="tag" href="/tags/aws/">aws</a><a class="tag" href="/tags/parameter-store/">parameter-store</a><a class="tag" href="/tags/bash/">bash</a><a class="tag" href="/tags/fsharp/">fsharp</a><a class="tag" href="/tags/jq/">jq</a></p></li></ul></section><section id="footer"><div class="footer-wrap">
+    <p class="copyright">Tech Nick</p>
+    <p class="powerby"><span>Powered&nbsp;by&nbsp;</span><a href="https://gohugo.io" 
+        target="_blank" rel="noopener noreferrer">Hugo</a><span>&nbsp;&amp;&nbsp;</span><a href="https://themes.gohugo.io/hugo-notepadium/" 
+        target="_blank" rel="noopener noreferrer">Notepadium</a></p></div></section></body>
 
-		<meta name="description" content="">
-
-
-		
-		
-		
-		<link rel="stylesheet" href="/css/ui.min.css"/>
-		
-		
-		
-
-		<link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono|Lato|Raleway">
-
-		
-
-		<style>
-	a { color: #ff8181; }
-	blockquote {
-		border-left-color: #ff8181;
-		border-right-color: #ff8181; }
-	.bar a:hover {
-		color: #ff8181;
-		text-decoration: none; }
-	.sep {
-		margin-top: 2rem;
-		margin-bottom: 1rem;
-		margin-left:0;
-		width: 24rem;
-		border-top: 2px solid #ff8181; }
-</style>
-
-	</head>
-
-<body>
-<header class="container no-print">
-	<div class="u-header">
-		<nav class="bar">
-	<ul><li>
-			<a href="/">
-				<img class="icon-text" src="/img/prev.svg"/>
-			</a>
-		</li></ul>
-</nav>
-
-	</div>
-</header>
-<main class="container">
-
-<article>
-	<header>
-		<hgroup id="brand">
-	<h1>Blog</h1>
-	
-</hgroup>
-<hr class="sep" />
-
-		
-	</header>
-	<ul class="no-bullet">
-	    
-	    <li>
-	
-	<span><time datetime="2021-04-13 00:42:14 &#43;0100 BST">Apr 13, 2021</time></span>
-	<a href="/blog/rightresult-write-up/">RightResult Write Up</a>
-</li>
-
-	    
-	    <li>
-	
-	<span><time datetime="2020-05-10 11:04:23 &#43;0100 BST">May 10, 2020</time></span>
-	<a href="/blog/serverless-integration-testing/">Integration testing a locally hosted serverless project</a>
-</li>
-
-	    
-	    <li>
-	
-	<span><time datetime="2019-11-29 10:00:00 &#43;0000 UTC">Nov 29, 2019</time></span>
-	<a href="/blog/dynamodb-functional-wrapper/">A functional wrapper around the .net AWS DynamoDB SDK</a>
-</li>
-
-	    
-	    <li>
-	
-	<span><time datetime="2019-08-02 11:36:05 &#43;0100 BST">Aug 02, 2019</time></span>
-	<a href="/blog/combining-monads/">Combining monads</a>
-</li>
-
-	    
-	    <li>
-	
-	<span><time datetime="2019-04-01 11:36:05 &#43;0100 BST">Apr 01, 2019</time></span>
-	<a href="/blog/serverless-package-done-right/">Serverless package done right</a>
-</li>
-
-	    
-	    <li>
-	
-	<span><time datetime="2018-10-16 10:36:05 &#43;0100 BST">Oct 16, 2018</time></span>
-	<a href="/blog/squash-git-commits/">Squash Git Commits</a>
-</li>
-
-	    
-	    <li>
-	
-	<span><time datetime="2018-10-12 16:35:01 &#43;0100 BST">Oct 12, 2018</time></span>
-	<a href="/blog/aws-parameter-store-scripting/">Scripting with AWS Parameter Store</a>
-</li>
-
-	    
-	</ul>
-	
-
-</article>
-			<hr class="sep" />
-		</main>
-		<footer class="container no-print">
-			<div class="u-footer">
-				
-
-<a href="https://github.com/blair55"><img class="icon-social" src="/img/github.svg" alt="Github"/></a>
-
-
-<a href="https://twitter.com/nickblair"><img class="icon-social" src="/img/twitter.svg" alt="Twitter"/></a>
-
-				<p>
-					
-					
-					
-				</p>
-				
-				<a href="#brand">
-					<img class="icon-text" src="/img/toup.svg" alt="To Up"/>
-					<span>Back to Up</span>
-				</a>
-				
-			</div>
-		</footer>
-		
-	</body>
 </html>
-

@@ -1,200 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="generator" content="Hugo 0.66.0" />
-		<title>Scripting with AWS Parameter Store - Tech Nick</title>
+<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.152.2"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark"><meta name="description" content="Ever need to write a short script as part of development to get feedback on a portion of code? Ever need to add private authentication values to that script? Ever wanted to add the script to source control but couldn&rsquo;t because it contained your private authentication?
 
-		<meta name="description" content="Ever need to write a short script as part of development to get feedback on a portion of code? Ever need to add private authentication values to that script? Ever wanted to add the script to source control but couldn&rsquo;t because it contained your private authentication?
- Enter: AWS Parameter Store
- This AWS service acts as a key-value store. Add your private settings such as usernames, passwords, connection strings etc and they can be retrieved programatically by their key name.">
+Enter: AWS Parameter Store
 
-
-		
-		
-		
-		<link rel="stylesheet" href="/css/ui.min.css"/>
-		
-		
-		
-
-		<link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono|Lato|Raleway">
-
-		
-
-		<style>
-	a { color: #ff8181; }
-	blockquote {
-		border-left-color: #ff8181;
-		border-right-color: #ff8181; }
-	.bar a:hover {
-		color: #ff8181;
-		text-decoration: none; }
-	.sep {
-		margin-top: 2rem;
-		margin-bottom: 1rem;
-		margin-left:0;
-		width: 24rem;
-		border-top: 2px solid #ff8181; }
-</style>
-
-	</head>
-
-<body>
-<header class="container no-print">
-	<div class="u-header">
-		<nav class="bar">
-	<ul><li>
-			<a href="/">
-				<img class="icon-text" src="/img/prev.svg"/>
-			</a>
-		</li></ul>
-</nav>
-
-	</div>
-</header>
-<main class="container">
-
-<article>
-	<header><hgroup id="brand">
-	<h1>Scripting with AWS Parameter Store</h1>
-	<h5>
-		
-		<time datetime="2018-10-12 16:35:01 &#43;0100 BST">Oct 12, 2018</time>
-		<span class="no-print">
-			-
-				
-				<a href="/tags/aws">aws</a>
-				
-				<a href="/tags/parameter-store">parameter-store</a>
-				
-				<a href="/tags/bash">bash</a>
-				
-				<a href="/tags/fsharp">fsharp</a>
-				
-				<a href="/tags/jq">jq</a>
-				<span>
-	</h5>
-	
-</hgroup>
-<hr class="sep" />
-</header>
-	<p>Ever need to write a short script as part of development to get feedback on a portion of code? Ever need to add private authentication values to that script? Ever wanted to add the script to source control but couldn&rsquo;t because it contained your private authentication?</p>
+This AWS service acts as a key-value store. Add your private settings such as usernames, passwords, connection strings etc and they can be retrieved programatically by their key name. This lets you commit your handy script to source control by keeping it free from private values."><title>Scripting with AWS Parameter Store&nbsp;&ndash;&nbsp;Tech Nick</title><link rel="stylesheet" href="/css/core.min.952a6d39cb50fac3eaa9e4386dd02bf0c2457e47928bc76ee18de871a100fec5835856656a5dc80bd4fb6f951cc004f3.css" integrity="sha384-lSptOctQ&#43;sPqqeQ4bdAr8MJFfkeSi8du4Y3ocaEA/sWDWFZlal3IC9T7b5UcwATz"><meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Scripting with AWS Parameter Store" /><body><section id="header">
+    <div class="header wrap"><span class="header left-side"><a class="site home" href="/"><span class="site name">Tech Nick</span></a></span>
+        <span class="header right-side"><div class="nav wrap"><nav class="nav"><a class="nav item" href="https://nickblair%2edev/"target="_blank" rel="noopener noreferrer">About</a></nav></div></span></div></section><section id="content"><div class="article-container"><section class="article header">
+    <h1 class="article title">Scripting with AWS Parameter Store</h1><p class="article date">2018-10-12</p></section><article class="article markdown-body"><p>Ever need to write a short script as part of development to get feedback on a portion of code? Ever need to add private authentication values to that script? Ever wanted to add the script to source control but couldn&rsquo;t because it contained your private authentication?</p>
 <blockquote>
 <p>Enter: AWS Parameter Store</p>
 </blockquote>
 <p>This AWS service acts as a key-value store. Add your private settings such as usernames, passwords, connection strings etc and they can be retrieved programatically by their key name. This lets you commit your handy script to source control by keeping it free from private values.</p>
 <h2 id="example">Example</h2>
 <blockquote>
-<p>Required: Your own AWS Account and the <a href="https://docs.aws.amazon.com/cli/latest/reference/ssm">AWS CLI</a> installed and configured. Make sure the aws output type configuration is json.
-Required: <a href="https://stedolan.github.io/jq/manual/">jq</a> cli</p>
+<p>Required: Your own AWS Account and the <a href="https://docs.aws.amazon.com/cli/latest/reference/ssm"target="_blank" rel="noopener noreferrer">AWS CLI</a> installed and configured. Make sure the aws output type configuration is json.
+Required: <a href="https://stedolan.github.io/jq/manual/"target="_blank" rel="noopener noreferrer">jq</a> cli</p>
 </blockquote>
 <p>Add a parameter to the store using the AWS CLI</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ aws ssm put-parameter --name <span class="s2">&#34;authtoken&#34;</span> --type <span class="s2">&#34;String&#34;</span> --value <span class="s2">&#34;foobar&#34;</span>
-</code></pre></div><p>Query the parameter store with the key name</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ aws ssm get-parameter --name <span class="s2">&#34;authtoken&#34;</span>
-&gt; <span class="o">{</span>
-    <span class="s2">&#34;Parameter&#34;</span>: <span class="o">{</span>
-        <span class="s2">&#34;Version&#34;</span>: 1,
-        <span class="s2">&#34;Type&#34;</span>: <span class="s2">&#34;String&#34;</span>,
-        <span class="s2">&#34;Name&#34;</span>: <span class="s2">&#34;authtoken&#34;</span>,
-        <span class="s2">&#34;Value&#34;</span>: <span class="s2">&#34;foobar&#34;</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div><p>Notice the output is in json format. To isolate the parameter value we can pipe the response into a jq expression:</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ aws ssm put-parameter --name <span class="s2">&#34;authtoken&#34;</span> --type <span class="s2">&#34;String&#34;</span> --value <span class="s2">&#34;foobar&#34;</span> <span class="p">|</span> jq -r .Parameter.Value
-&gt; foobar
-</code></pre></div><p>Armed with this command we can create a script that is absent of hard-coded private values.</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">get_param<span class="o">()</span> <span class="o">{</span>
-    <span class="nv">P</span><span class="o">=</span><span class="k">$(</span>aws ssm get-parameter --name <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.Parameter.Value&#39;</span><span class="k">)</span>
-    <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$P</span><span class="s2">&#34;</span>
-<span class="o">}</span>
-
-<span class="nv">AUTH_TOKEN</span><span class="o">=</span><span class="k">$(</span>get_param <span class="s2">&#34;authtoken&#34;</span><span class="k">)</span>
-<span class="nb">echo</span> AUTH_TOKEN
-</code></pre></div><h2 id="taking-it-further">Taking it Further</h2>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ aws ssm put-parameter --name <span style="color:#a3be8c">&#34;authtoken&#34;</span> --type <span style="color:#a3be8c">&#34;String&#34;</span> --value <span style="color:#a3be8c">&#34;foobar&#34;</span>
+</span></span></code></pre></div><p>Query the parameter store with the key name</p>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ aws ssm get-parameter --name <span style="color:#a3be8c">&#34;authtoken&#34;</span>
+</span></span><span style="display:flex;"><span>&gt; <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a3be8c">&#34;Parameter&#34;</span>: <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a3be8c">&#34;Version&#34;</span>: 1,
+</span></span><span style="display:flex;"><span>        <span style="color:#a3be8c">&#34;Type&#34;</span>: <span style="color:#a3be8c">&#34;String&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a3be8c">&#34;Name&#34;</span>: <span style="color:#a3be8c">&#34;authtoken&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a3be8c">&#34;Value&#34;</span>: <span style="color:#a3be8c">&#34;foobar&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1">}</span>
+</span></span></code></pre></div><p>Notice the output is in json format. To isolate the parameter value we can pipe the response into a jq expression:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ aws ssm put-parameter --name <span style="color:#a3be8c">&#34;authtoken&#34;</span> --type <span style="color:#a3be8c">&#34;String&#34;</span> --value <span style="color:#a3be8c">&#34;foobar&#34;</span> <span style="color:#eceff4">|</span> jq -r .Parameter.Value
+</span></span><span style="display:flex;"><span>&gt; foobar
+</span></span></code></pre></div><p>Armed with this command we can create a script that is absent of hard-coded private values.</p>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>get_param<span style="color:#81a1c1">()</span> <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>    P<span style="color:#81a1c1">=</span><span style="color:#81a1c1;font-weight:bold">$(</span>aws ssm get-parameter --name <span style="color:#a3be8c">&#34;</span>$1<span style="color:#a3be8c">&#34;</span> <span style="color:#eceff4">|</span> jq -r <span style="color:#a3be8c">&#39;.Parameter.Value&#39;</span><span style="color:#81a1c1;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1">echo</span> <span style="color:#a3be8c">&#34;</span>$P<span style="color:#a3be8c">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>AUTH_TOKEN<span style="color:#81a1c1">=</span><span style="color:#81a1c1;font-weight:bold">$(</span>get_param <span style="color:#a3be8c">&#34;authtoken&#34;</span><span style="color:#81a1c1;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1">echo</span> AUTH_TOKEN
+</span></span></code></pre></div><h2 id="taking-it-further">Taking it Further</h2>
 <p>Ever needed to write a script using a general purpose language?</p>
 <p>In a recent example, I needed to execute a script written in F#. The script required private values from the parameter store.</p>
 <p>I simply extended the original script to populate environment variables followed by a call to invoke the F# script.</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">get_param<span class="o">()</span> <span class="o">{</span>
-    <span class="nv">P</span><span class="o">=</span><span class="k">$(</span>aws ssm get-parameter --name <span class="s2">&#34;</span><span class="nv">$1</span><span class="s2">&#34;</span> <span class="p">|</span> jq -r <span class="s1">&#39;.Parameter.Value&#39;</span><span class="k">)</span>
-    <span class="nb">echo</span> <span class="s2">&#34;</span><span class="nv">$P</span><span class="s2">&#34;</span>
-<span class="o">}</span>
-
-<span class="nv">AUTH_TOKEN</span><span class="o">=</span><span class="k">$(</span>get_param <span class="s2">&#34;authtoken&#34;</span><span class="k">)</span> <span class="se">\
-</span><span class="se"></span><span class="nv">BASE_URL</span><span class="o">=</span><span class="k">$(</span>get_param <span class="s2">&#34;baseurl&#34;</span><span class="k">)</span> <span class="se">\
-</span><span class="se"></span>fsharpi script.fsx
-</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">let</span> <span class="nv">env</span> <span class="o">=</span>
-    <span class="nn">System</span><span class="p">.</span><span class="nn">Environment</span><span class="p">.</span><span class="n">GetEnvironmentVariable</span>
-
-<span class="k">let</span> <span class="nv">log</span> <span class="o">=</span>
-    <span class="n">printfn</span> <span class="s">&#34;%s&#34;</span>
-
-<span class="n">env</span> <span class="s">&#34;AUTH_TOKEN&#34;</span> <span class="o">|&gt;</span> <span class="n">log</span>
-<span class="n">env</span> <span class="s">&#34;BASE_URL&#34;</span> <span class="o">|&gt;</span> <span class="n">log</span>
-</code></pre></div><h2 id="path-support">Path Support</h2>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>get_param<span style="color:#81a1c1">()</span> <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>    P<span style="color:#81a1c1">=</span><span style="color:#81a1c1;font-weight:bold">$(</span>aws ssm get-parameter --name <span style="color:#a3be8c">&#34;</span>$1<span style="color:#a3be8c">&#34;</span> <span style="color:#eceff4">|</span> jq -r <span style="color:#a3be8c">&#39;.Parameter.Value&#39;</span><span style="color:#81a1c1;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1">echo</span> <span style="color:#a3be8c">&#34;</span>$P<span style="color:#a3be8c">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>AUTH_TOKEN<span style="color:#81a1c1">=</span><span style="color:#81a1c1;font-weight:bold">$(</span>get_param <span style="color:#a3be8c">&#34;authtoken&#34;</span><span style="color:#81a1c1;font-weight:bold">)</span> <span style="color:#ebcb8b">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ebcb8b"></span>BASE_URL<span style="color:#81a1c1">=</span><span style="color:#81a1c1;font-weight:bold">$(</span>get_param <span style="color:#a3be8c">&#34;baseurl&#34;</span><span style="color:#81a1c1;font-weight:bold">)</span> <span style="color:#ebcb8b">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ebcb8b"></span>fsharpi script.fsx
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fsharp" data-lang="fsharp"><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">let</span> env <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8fbcbb">System</span><span style="color:#eceff4">.</span><span style="color:#8fbcbb">Environment</span><span style="color:#eceff4">.</span>GetEnvironmentVariable
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">let</span> log <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>    printfn <span style="color:#a3be8c">&#34;%s&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>env <span style="color:#a3be8c">&#34;AUTH_TOKEN&#34;</span> <span style="color:#81a1c1">|&gt;</span> log
+</span></span><span style="display:flex;"><span>env <span style="color:#a3be8c">&#34;BASE_URL&#34;</span> <span style="color:#81a1c1">|&gt;</span> log
+</span></span></code></pre></div><h2 id="path-support">Path Support</h2>
 <p>Ever needed to get a collection of parameters?</p>
 <p>AWS Parameter Store key names can be provided as a path. This allows you to group parameters logically, for example by system or environment, or both.</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ aws ssm put-parameter --name <span class="s2">&#34;/production/authtoken&#34;</span> --type <span class="s2">&#34;String&#34;</span> --value <span class="s2">&#34;foobar&#34;</span>
-$ aws ssm put-parameter --name <span class="s2">&#34;/production/baseurl&#34;</span> --type <span class="s2">&#34;String&#34;</span> --value <span class="s2">&#34;www.example.url&#34;</span>
-</code></pre></div><p>Parameters can then be fetched by path. Meaning your production system can retrieve all the keys under the production path.</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ aws ssm get-parameters-by-path --path <span class="s2">&#34;/production&#34;</span>
-&gt; <span class="o">{</span>
-    <span class="s2">&#34;Parameters&#34;</span>: <span class="o">[</span>
-        <span class="o">{</span>
-            <span class="s2">&#34;Version&#34;</span>: 1,
-            <span class="s2">&#34;Type&#34;</span>: <span class="s2">&#34;String&#34;</span>,
-            <span class="s2">&#34;Name&#34;</span>: <span class="s2">&#34;/production/authtoken&#34;</span>,
-            <span class="s2">&#34;Value&#34;</span>: <span class="s2">&#34;foobar&#34;</span>
-        <span class="o">}</span>,
-        <span class="o">{</span>
-            <span class="s2">&#34;Version&#34;</span>: 1,
-            <span class="s2">&#34;Type&#34;</span>: <span class="s2">&#34;String&#34;</span>,
-            <span class="s2">&#34;Name&#34;</span>: <span class="s2">&#34;/production/baseurl&#34;</span>,
-            <span class="s2">&#34;Value&#34;</span>: <span class="s2">&#34;www.example.url&#34;</span>
-        <span class="o">}</span>
-    <span class="o">]</span>
-<span class="o">}</span>
-</code></pre></div><p>Note the output is a collection of parameters.</p>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ aws ssm put-parameter --name <span style="color:#a3be8c">&#34;/production/authtoken&#34;</span> --type <span style="color:#a3be8c">&#34;String&#34;</span> --value <span style="color:#a3be8c">&#34;foobar&#34;</span>
+</span></span><span style="display:flex;"><span>$ aws ssm put-parameter --name <span style="color:#a3be8c">&#34;/production/baseurl&#34;</span> --type <span style="color:#a3be8c">&#34;String&#34;</span> --value <span style="color:#a3be8c">&#34;www.example.url&#34;</span>
+</span></span></code></pre></div><p>Parameters can then be fetched by path. Meaning your production system can retrieve all the keys under the production path.</p>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ aws ssm get-parameters-by-path --path <span style="color:#a3be8c">&#34;/production&#34;</span>
+</span></span><span style="display:flex;"><span>&gt; <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a3be8c">&#34;Parameters&#34;</span>: <span style="color:#81a1c1">[</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a3be8c">&#34;Version&#34;</span>: 1,
+</span></span><span style="display:flex;"><span>            <span style="color:#a3be8c">&#34;Type&#34;</span>: <span style="color:#a3be8c">&#34;String&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a3be8c">&#34;Name&#34;</span>: <span style="color:#a3be8c">&#34;/production/authtoken&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a3be8c">&#34;Value&#34;</span>: <span style="color:#a3be8c">&#34;foobar&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#81a1c1">}</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a3be8c">&#34;Version&#34;</span>: 1,
+</span></span><span style="display:flex;"><span>            <span style="color:#a3be8c">&#34;Type&#34;</span>: <span style="color:#a3be8c">&#34;String&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a3be8c">&#34;Name&#34;</span>: <span style="color:#a3be8c">&#34;/production/baseurl&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a3be8c">&#34;Value&#34;</span>: <span style="color:#a3be8c">&#34;www.example.url&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#81a1c1">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1">}</span>
+</span></span></code></pre></div><p>Note the output is a collection of parameters.</p>
+</article><section class="article labels"><a class="tag" href=/tags/aws/>aws</a><a class="tag" href=/tags/parameter-store/>parameter-store</a><a class="tag" href=/tags/bash/>bash</a><a class="tag" href=/tags/fsharp/>fsharp</a><a class="tag" href=/tags/jq/>jq</a></section><section class="article author"><img alt="" loading="lazy" class="avatar" src="/img/avatar.jpg"/><div class="details"><a class="item" href="https://github.com/blair55" target="_blank" rel="noopener noreferrer"><span class="iconfont icon-github"></span>&nbsp;blair55</a><a class="item" href="https://bsky.app/profile/nickblair.dev" target="_blank" rel="noopener noreferrer"><span class="iconfont"><img style="width: 1em; margin-bottom: -2px;" src="/img/bluesky.svg" alt="Bluesky"/></span>&nbsp;@nickblair.dev</a></div>
+</section>
+</div>
+<div class="article bottom"><section class="article navigation"><p><a class="link" href="/blog/squash-git-commits/"><span class="iconfont icon-article"></span>Squash Git Commits</a></p></section></div></section><section id="footer"><div class="footer-wrap">
+    <p class="copyright">Tech Nick</p>
+    <p class="powerby"><span>Powered&nbsp;by&nbsp;</span><a href="https://gohugo.io" 
+        target="_blank" rel="noopener noreferrer">Hugo</a><span>&nbsp;&amp;&nbsp;</span><a href="https://themes.gohugo.io/hugo-notepadium/" 
+        target="_blank" rel="noopener noreferrer">Notepadium</a></p></div></section></body>
 
-</article>
-<nav class="no-print post-nav">
-
-
-	<a class="next-post" href="https://blair55.github.io/blog/squash-git-commits/">Squash Git Commits<img class="icon-text" src="/img/next.svg"/>
-	</a>
-
-</nav>
-
-
-
-
-			<hr class="sep" />
-		</main>
-		<footer class="container no-print">
-			<div class="u-footer">
-				
-
-<a href="https://github.com/blair55"><img class="icon-social" src="/img/github.svg" alt="Github"/></a>
-
-
-<a href="https://twitter.com/nickblair"><img class="icon-social" src="/img/twitter.svg" alt="Twitter"/></a>
-
-				<p>
-					
-					
-					
-				</p>
-				
-				<a href="#brand">
-					<img class="icon-text" src="/img/toup.svg" alt="To Up"/>
-					<span>Back to Up</span>
-				</a>
-				
-			</div>
-		</footer>
-		
-	</body>
 </html>
-

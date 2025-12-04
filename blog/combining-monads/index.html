@@ -1,299 +1,190 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="generator" content="Hugo 0.66.0" />
-		<title>Combining monads - Tech Nick</title>
+<html lang="en"><meta charset="utf-8"><meta name="generator" content="Hugo 0.152.2"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark"><meta name="description" content="The F# Result&lt;&#39;a,&#39;b&gt; type allows for concise control flow syntax. The async { ... } computation expression similarly minimizes the noise of asynchrony. Throw in the Writer monad for logging minus the intrinsic IO statements. How do you get the benefits of all three together? You need to combine&hellip;
 
-		<meta name="description" content="The F# Result&lt;&#39;a,&#39;b&gt; type allows for concise control flow syntax. The async { ... } computation expression similarly minimizes the noise of asynchrony. Throw in the Writer monad for logging minus the intrinsic IO statements. How do you get the benefits of all three together? You need to combine&hellip;
- Source code gist.
- Writer The Result and Async types are core types in F# but Writer is not so we need a bit of boilerplate to get going.">
+Source code gist.
 
-
-		
-		
-		
-		<link rel="stylesheet" href="/css/ui.min.css"/>
-		
-		
-		
-
-		<link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono|Lato|Raleway">
-
-		
-
-		<style>
-	a { color: #ff8181; }
-	blockquote {
-		border-left-color: #ff8181;
-		border-right-color: #ff8181; }
-	.bar a:hover {
-		color: #ff8181;
-		text-decoration: none; }
-	.sep {
-		margin-top: 2rem;
-		margin-bottom: 1rem;
-		margin-left:0;
-		width: 24rem;
-		border-top: 2px solid #ff8181; }
-</style>
-
-	</head>
-
-<body>
-<header class="container no-print">
-	<div class="u-header">
-		<nav class="bar">
-	<ul><li>
-			<a href="/">
-				<img class="icon-text" src="/img/prev.svg"/>
-			</a>
-		</li></ul>
-</nav>
-
-	</div>
-</header>
-<main class="container">
-
-<article>
-	<header><hgroup id="brand">
-	<h1>Combining monads</h1>
-	<h5>
-		
-		<time datetime="2019-08-02 11:36:05 &#43;0100 BST">Aug 02, 2019</time>
-		<span class="no-print">
-			-
-				
-				<a href="/tags/fsharp">fsharp</a>
-				
-				<a href="/tags/functional">functional</a>
-				
-				<a href="/tags/monads">monads</a>
-				<span>
-	</h5>
-	
-</hgroup>
-<hr class="sep" />
-</header>
-	<p>The F# <code>Result&lt;'a,'b&gt;</code> type allows for concise control flow syntax. The <code>async { ... }</code> computation expression similarly minimizes the noise of asynchrony. Throw in the <code>Writer</code> monad for logging minus the intrinsic IO statements. How do you get the benefits of all three together? You need to combine&hellip;</p>
+Writer
+The Result and Async types are core types in F# but Writer is not so we need a bit of boilerplate to get going. We define a single case union type in which the single case is parameterized with a function. The function expects a unit and returns a tuple. See this post for details."><title>Combining monads&nbsp;&ndash;&nbsp;Tech Nick</title><link rel="stylesheet" href="/css/core.min.952a6d39cb50fac3eaa9e4386dd02bf0c2457e47928bc76ee18de871a100fec5835856656a5dc80bd4fb6f951cc004f3.css" integrity="sha384-lSptOctQ&#43;sPqqeQ4bdAr8MJFfkeSi8du4Y3ocaEA/sWDWFZlal3IC9T7b5UcwATz"><meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Combining monads" /><body><section id="header">
+    <div class="header wrap"><span class="header left-side"><a class="site home" href="/"><span class="site name">Tech Nick</span></a></span>
+        <span class="header right-side"><div class="nav wrap"><nav class="nav"><a class="nav item" href="https://nickblair%2edev/"target="_blank" rel="noopener noreferrer">About</a></nav></div></span></div></section><section id="content"><div class="article-container"><section class="article header">
+    <h1 class="article title">Combining monads</h1><p class="article date">2019-08-02</p></section><article class="article markdown-body"><p>The F# <code>Result&lt;'a,'b&gt;</code> type allows for concise control flow syntax. The <code>async { ... }</code> computation expression similarly minimizes the noise of asynchrony. Throw in the <code>Writer</code> monad for logging minus the intrinsic IO statements. How do you get the benefits of all three together? You need to combine&hellip;</p>
 <blockquote>
-<p>Source code <a href="https://gist.github.com/blair55/ed415eb479d639f471418f482545fa0e">gist</a>.</p>
+<p>Source code <a href="https://gist.github.com/blair55/ed415eb479d639f471418f482545fa0e"target="_blank" rel="noopener noreferrer">gist</a>.</p>
 </blockquote>
 <h2 id="writer">Writer</h2>
-<p>The <code>Result</code> and <code>Async</code> types are core types in F# but <code>Writer</code> is not so we need a bit of boilerplate to get going. We define a single case union type in which the single case is parameterized with a function. The function expects a unit and returns a tuple. See <a href="http://codebetter.com/matthewpodwysocki/2010/02/02/a-kick-in-the-monads-writer-edition/">this post</a> for details.</p>
-<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">type</span> <span class="nc">Writer</span><span class="o">&lt;</span><span class="k">&#39;</span><span class="n">w</span><span class="o">,</span> <span class="k">&#39;</span><span class="n">t</span><span class="o">&gt;</span> <span class="o">=</span>
-  <span class="n">Writer</span> <span class="k">of</span> <span class="o">(</span><span class="kt">unit</span> <span class="o">-&gt;</span> <span class="k">&#39;</span><span class="n">t</span> <span class="o">*</span> <span class="k">&#39;</span><span class="n">w</span><span class="o">)</span>
-
-<span class="k">module</span> <span class="nn">Writer</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">run</span><span class="o">&lt;</span><span class="k">&#39;</span><span class="n">w</span><span class="o">,</span><span class="k">&#39;</span><span class="n">t</span><span class="o">&gt;</span> <span class="o">(</span><span class="n">Writer</span> <span class="n">w</span><span class="o">)</span> <span class="o">:</span> <span class="o">(</span><span class="k">&#39;</span><span class="n">t</span> <span class="o">*</span> <span class="k">&#39;</span><span class="n">w</span><span class="o">)</span> <span class="o">=</span>
-    <span class="n">w</span> <span class="bp">()</span>
-</code></pre></div><h2 id="bind">Bind</h2>
+<p>The <code>Result</code> and <code>Async</code> types are core types in F# but <code>Writer</code> is not so we need a bit of boilerplate to get going. We define a single case union type in which the single case is parameterized with a function. The function expects a unit and returns a tuple. See <a href="http://codebetter.com/matthewpodwysocki/2010/02/02/a-kick-in-the-monads-writer-edition/"target="_blank" rel="noopener noreferrer">this post</a> for details.</p>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fsharp" data-lang="fsharp"><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">type</span> <span style="color:#8fbcbb">Writer</span><span style="color:#81a1c1">&lt;</span><span style="color:#81a1c1;font-weight:bold">&#39;</span>w<span style="color:#81a1c1">,</span> <span style="color:#81a1c1;font-weight:bold">&#39;</span>t<span style="color:#81a1c1">&gt;</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>  Writer <span style="color:#81a1c1;font-weight:bold">of</span> <span style="color:#81a1c1">(</span><span style="color:#81a1c1">unit</span> <span style="color:#81a1c1">-&gt;</span> <span style="color:#81a1c1;font-weight:bold">&#39;</span>t <span style="color:#81a1c1">*</span> <span style="color:#81a1c1;font-weight:bold">&#39;</span>w<span style="color:#81a1c1">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">Writer</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> run<span style="color:#81a1c1">&lt;</span><span style="color:#81a1c1;font-weight:bold">&#39;</span>w<span style="color:#81a1c1">,</span><span style="color:#81a1c1;font-weight:bold">&#39;</span>t<span style="color:#81a1c1">&gt;</span> <span style="color:#81a1c1">(</span>Writer w<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">:</span> <span style="color:#81a1c1">(</span><span style="color:#81a1c1;font-weight:bold">&#39;</span>t <span style="color:#81a1c1">*</span> <span style="color:#81a1c1;font-weight:bold">&#39;</span>w<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>    w <span style="color:#81a1c1">()</span>
+</span></span></code></pre></div><h2 id="bind">Bind</h2>
 <p>Now, lets cover the <code>bind</code> function for each type.</p>
-<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="c1">// bind signature
-</span><span class="c1">// (&#39;a -&gt; Wrapper&lt;&#39;b&gt;) -&gt; &#39;Wrapper&lt;&#39;a&gt; -&gt; Wrapper&lt;&#39;b&gt;
-</span><span class="c1"></span>
-<span class="k">module</span> <span class="nn">Result</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">bind</span> <span class="n">f</span> <span class="o">=</span> <span class="k">function</span>
-    <span class="o">|</span> <span class="n">Ok</span> <span class="n">x</span> <span class="o">-&gt;</span> <span class="n">f</span> <span class="n">x</span>
-    <span class="o">|</span> <span class="n">Error</span> <span class="n">e</span> <span class="o">-&gt;</span> <span class="n">Error</span> <span class="n">e</span>
-
-<span class="k">module</span> <span class="nn">Async</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">bind</span> <span class="n">f</span> <span class="n">m</span> <span class="o">=</span> <span class="n">async</span> <span class="o">{</span>
-    <span class="k">let!</span> <span class="nv">x</span> <span class="o">=</span> <span class="n">m</span>
-    <span class="k">return</span><span class="o">!</span> <span class="n">f</span> <span class="n">x</span> <span class="o">}</span>
-
-<span class="k">module</span> <span class="nn">Writer</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">bind</span> <span class="n">f</span> <span class="n">m</span> <span class="o">=</span>
-    <span class="k">let</span> <span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">logs1</span><span class="o">)</span> <span class="o">=</span> <span class="n">run</span> <span class="n">m</span>
-    <span class="k">let</span> <span class="o">(</span><span class="n">y</span><span class="o">,</span> <span class="n">logs2</span><span class="o">)</span> <span class="o">=</span> <span class="n">run</span> <span class="o">(</span><span class="n">f</span> <span class="n">x</span><span class="o">)</span>
-    <span class="n">Writer</span> <span class="o">&lt;|</span> <span class="k">fun</span> <span class="bp">()</span> <span class="o">-&gt;</span> <span class="n">y</span><span class="o">,</span> <span class="n">logs1</span> <span class="o">@</span> <span class="n">logs2</span>
-</code></pre></div><p>A pattern is present in each of these functions. The signatures are obviously the same but the behaviours can also be generalized. If we were to describe what is going on in general terms we would say:</p>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fsharp" data-lang="fsharp"><span style="display:flex;"><span><span style="color:#616e87;font-style:italic">// bind signature
+</span></span></span><span style="display:flex;"><span><span style="color:#616e87;font-style:italic">// (&#39;a -&gt; Wrapper&lt;&#39;b&gt;) -&gt; &#39;Wrapper&lt;&#39;a&gt; -&gt; Wrapper&lt;&#39;b&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#616e87;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">Result</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> bind f <span style="color:#81a1c1">=</span> <span style="color:#81a1c1;font-weight:bold">function</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1">|</span> Ok x <span style="color:#81a1c1">-&gt;</span> f x
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1">|</span> Error e <span style="color:#81a1c1">-&gt;</span> Error e
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">Async</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> bind f m <span style="color:#81a1c1">=</span> async <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">let!</span> x <span style="color:#81a1c1">=</span> m
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">return</span><span style="color:#81a1c1">!</span> f x <span style="color:#81a1c1">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">Writer</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> bind f m <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">let</span> <span style="color:#81a1c1">(</span>x<span style="color:#81a1c1">,</span> logs1<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">=</span> run m
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">let</span> <span style="color:#81a1c1">(</span>y<span style="color:#81a1c1">,</span> logs2<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">=</span> run <span style="color:#81a1c1">(</span>f x<span style="color:#81a1c1">)</span>
+</span></span><span style="display:flex;"><span>    Writer <span style="color:#81a1c1">&lt;|</span> <span style="color:#81a1c1;font-weight:bold">fun</span> <span style="color:#81a1c1">()</span> <span style="color:#81a1c1">-&gt;</span> y<span style="color:#81a1c1">,</span> logs1 <span style="color:#81a1c1">@</span> logs2
+</span></span></code></pre></div><p>A pattern is present in each of these functions. The signatures are obviously the same but the behaviours can also be generalized. If we were to describe what is going on in general terms we would say:</p>
 <blockquote>
 <p>Unwrap the outer type to reveal the inner value <code>x</code>. Then, run the given function <code>f</code> against the value and return the result re-wrapped in the outer type.</p>
 </blockquote>
 <p>There is some subtlety in each to preserve the meaning of the wrapping type. In the <code>Result</code> case we only want to run the function if the unwrapped value is <code>Ok</code>. With <code>Async</code> there is no condition, but <code>return!</code> must be used to re-wrap the value. The <code>Writer</code> type requires us to unwrap twice: once to get the initial unwrapped value, then again to get the unwrapped value after applying the function. The logs from both are concatenated in a returned <code>Writer</code>.</p>
 <h2 id="combining">Combining</h2>
 <p>It seems sensible to order the types as follows:</p>
-<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="n">Async</span> <span class="o">&lt;</span> <span class="n">Writer</span> <span class="o">&lt;</span> <span class="o">_,</span> <span class="n">Result</span> <span class="o">&lt;</span> <span class="o">_,</span> <span class="o">_</span> <span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;</span>
-</code></pre></div><p>The <code>Async</code> type always needs to be on the outside because typically we want to return this type to a framework, something else will be responsible for waiting for the async operation to complete. The middle type should be <code>Writer</code> because we always want to capture the output. If the <code>Result</code> and <code>Writer</code> positions were reversed we would only get the <code>Writer</code> type back if the <code>Result</code> type returned an <code>Ok</code> case, which is undesirable.</p>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fsharp" data-lang="fsharp"><span style="display:flex;"><span>Async <span style="color:#81a1c1">&lt;</span> Writer <span style="color:#81a1c1">&lt;</span> <span style="color:#81a1c1">_,</span> Result <span style="color:#81a1c1">&lt;</span> <span style="color:#81a1c1">_,</span> <span style="color:#81a1c1">_</span> <span style="color:#81a1c1">&gt;</span> <span style="color:#81a1c1">&gt;</span> <span style="color:#81a1c1">&gt;</span>
+</span></span></code></pre></div><p>The <code>Async</code> type always needs to be on the outside because typically we want to return this type to a framework, something else will be responsible for waiting for the async operation to complete. The middle type should be <code>Writer</code> because we always want to capture the output. If the <code>Result</code> and <code>Writer</code> positions were reversed we would only get the <code>Writer</code> type back if the <code>Result</code> type returned an <code>Ok</code> case, which is undesirable.</p>
 <h3 id="the-first-two">The First Two</h3>
 <p>Let&rsquo;s combine just the middle two types and work our way up to three. I&rsquo;ve found it useful to have the inner types combined as some workflows turn out not to be asynchronous and can easily be made so using <code>Async.map</code> to fit with other workflows.</p>
-<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">module</span> <span class="nn">WriterResult</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">bind</span> <span class="n">f</span> <span class="n">m</span> <span class="o">=</span>
-    <span class="k">let</span> <span class="o">(</span><span class="n">r</span><span class="o">,</span> <span class="n">logs1</span><span class="o">)</span> <span class="o">=</span> <span class="nn">Writer</span><span class="p">.</span><span class="n">run</span> <span class="n">m</span>
-    <span class="k">match</span> <span class="n">r</span> <span class="k">with</span>
-    <span class="o">|</span> <span class="n">Ok</span> <span class="n">a</span> <span class="o">-&gt;</span>
-      <span class="k">let</span> <span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">logs2</span><span class="o">)</span> <span class="o">=</span> <span class="nn">Writer</span><span class="p">.</span><span class="n">run</span> <span class="o">(</span><span class="n">f</span> <span class="n">a</span><span class="o">)</span>
-      <span class="n">Writer</span> <span class="o">&lt;|</span> <span class="k">fun</span> <span class="bp">()</span> <span class="o">-&gt;</span> <span class="n">b</span><span class="o">,</span> <span class="n">logs1</span> <span class="o">@</span> <span class="n">logs2</span>
-    <span class="o">|</span> <span class="n">Error</span> <span class="n">e</span> <span class="o">-&gt;</span>
-      <span class="n">Writer</span> <span class="o">&lt;|</span> <span class="k">fun</span> <span class="bp">()</span> <span class="o">-&gt;</span> <span class="n">Error</span> <span class="n">e</span><span class="o">,</span> <span class="n">logs1</span>
-</code></pre></div><p>Notice the signature of this function is exactly the same as the for the singular wrapping cases above. The generic types <code>'a</code> and <code>'b</code> are now a bit more embellished. Even the description of the function still applies. There is just now a bit more going on in order to &lsquo;unwrap&rsquo; the inner value.</p>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fsharp" data-lang="fsharp"><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">WriterResult</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> bind f m <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">let</span> <span style="color:#81a1c1">(</span>r<span style="color:#81a1c1">,</span> logs1<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">=</span> <span style="color:#8fbcbb">Writer</span><span style="color:#eceff4">.</span>run m
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">match</span> r <span style="color:#81a1c1;font-weight:bold">with</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1">|</span> Ok a <span style="color:#81a1c1">-&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#81a1c1;font-weight:bold">let</span> <span style="color:#81a1c1">(</span>b<span style="color:#81a1c1">,</span> logs2<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">=</span> <span style="color:#8fbcbb">Writer</span><span style="color:#eceff4">.</span>run <span style="color:#81a1c1">(</span>f a<span style="color:#81a1c1">)</span>
+</span></span><span style="display:flex;"><span>      Writer <span style="color:#81a1c1">&lt;|</span> <span style="color:#81a1c1;font-weight:bold">fun</span> <span style="color:#81a1c1">()</span> <span style="color:#81a1c1">-&gt;</span> b<span style="color:#81a1c1">,</span> logs1 <span style="color:#81a1c1">@</span> logs2
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1">|</span> Error e <span style="color:#81a1c1">-&gt;</span>
+</span></span><span style="display:flex;"><span>      Writer <span style="color:#81a1c1">&lt;|</span> <span style="color:#81a1c1;font-weight:bold">fun</span> <span style="color:#81a1c1">()</span> <span style="color:#81a1c1">-&gt;</span> Error e<span style="color:#81a1c1">,</span> logs1
+</span></span></code></pre></div><p>Notice the signature of this function is exactly the same as the for the singular wrapping cases above. The generic types <code>'a</code> and <code>'b</code> are now a bit more embellished. Even the description of the function still applies. There is just now a bit more going on in order to &lsquo;unwrap&rsquo; the inner value.</p>
 <p>When handling combined types, we have to &lsquo;unwrap&rsquo; according to the order of the types. Our type here is <code>WriterResult</code>, meaning that <code>Writer</code> wraps <code>Result</code>. We therefore need to unwrap <code>Writer</code> before unwrapping <code>Result</code>.</p>
 <p>So our first step is to unwrap the <code>Writer</code>, revealing any written logs and a <code>Result</code>. Now, we can unwrap the <code>Result</code> to get to our inner value. If this value is <code>Ok</code> we preserve the meaning of <code>Result</code> by continuing to apply our function <code>f</code> to the inner value. However, <code>f</code> is a function that returns <code>Writer</code>, so we must unwrap that too to get another value and some more logs. This second value the result type that we want to return, along with all the logs. We therefore wrap in up in a new <code>Writer</code> with the concatenated logs.</p>
 <p>If the first <code>Result</code> we encountered by unwrapping our writer turned out to be the <code>Error</code> case then we return this <code>Error</code> wrapped in a <code>Writer</code> without using <code>f</code> at all.</p>
 <h3 id="all-three">All Three</h3>
 <p>The same wrapping and unwrapping technique applies when adding a third outer type. We simply have to accommodate the correct order of the types. Again, the signature and description do not change as the meaning of <code>bind</code> is consistent no matter how many outer types there are.</p>
-<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">module</span> <span class="nn">AsyncWriterResult</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">bind</span> <span class="n">f</span> <span class="n">m</span> <span class="o">=</span> <span class="n">async</span> <span class="o">{</span>
-    <span class="k">let!</span> <span class="nv">w1</span> <span class="o">=</span> <span class="n">m</span>
-    <span class="k">let</span> <span class="o">(</span><span class="n">r</span><span class="o">,</span> <span class="n">logs1</span><span class="o">)</span> <span class="o">=</span> <span class="nn">Writer</span><span class="p">.</span><span class="n">run</span> <span class="n">w1</span>
-    <span class="k">match</span> <span class="n">r</span> <span class="k">with</span>
-    <span class="o">|</span> <span class="n">Ok</span> <span class="n">a</span> <span class="o">-&gt;</span>
-      <span class="k">let!</span> <span class="nv">w2</span> <span class="o">=</span> <span class="n">f</span> <span class="n">a</span>
-      <span class="k">let</span> <span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="n">logs2</span><span class="o">)</span> <span class="o">=</span> <span class="nn">Writer</span><span class="p">.</span><span class="n">run</span> <span class="n">w2</span>
-      <span class="k">return</span> <span class="n">Writer</span> <span class="o">&lt;|</span> <span class="k">fun</span> <span class="bp">()</span> <span class="o">-&gt;</span> <span class="n">b</span><span class="o">,</span> <span class="n">logs1</span> <span class="o">@</span> <span class="n">logs2</span>
-    <span class="o">|</span> <span class="n">Error</span> <span class="n">e</span> <span class="o">-&gt;</span>
-      <span class="k">return</span> <span class="n">Writer</span> <span class="o">&lt;|</span> <span class="k">fun</span> <span class="bp">()</span> <span class="o">-&gt;</span> <span class="n">Error</span> <span class="n">e</span><span class="o">,</span> <span class="n">logs1</span> <span class="o">}</span>
-</code></pre></div><p>This looks very similar to the <code>WriterResult</code> type. The difference is obviously the reference to the <code>async</code> computation expression. This is needed to unwrap in the correct order. We start with unwrapping the <code>Async</code> type using <code>let!</code> to reveal a <code>WriterResult</code>. This then needs to be unwrapped to reveal a <code>Result</code> and some logs. If the <code>Result</code> is <code>Ok</code> we can apply our function and which gives us an <code>AsyncWriterResult</code>. We have to again unwrap with <code>let!</code> to get a <code>WriterResult</code>. We unwrap the <code>WriterResult</code> leaving us just a <code>Result</code> and some more logs. The <code>Result</code> is returned in a new <code>Writer</code> with the concatenated logs using the <code>return</code> statement to wrap in an <code>Async</code>. As before, if the inner <code>Result</code> is an <code>Error</code> case we do not want to apply <code>f</code> and exit early.</p>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fsharp" data-lang="fsharp"><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">AsyncWriterResult</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> bind f m <span style="color:#81a1c1">=</span> async <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">let!</span> w1 <span style="color:#81a1c1">=</span> m
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">let</span> <span style="color:#81a1c1">(</span>r<span style="color:#81a1c1">,</span> logs1<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">=</span> <span style="color:#8fbcbb">Writer</span><span style="color:#eceff4">.</span>run w1
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">match</span> r <span style="color:#81a1c1;font-weight:bold">with</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1">|</span> Ok a <span style="color:#81a1c1">-&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#81a1c1;font-weight:bold">let!</span> w2 <span style="color:#81a1c1">=</span> f a
+</span></span><span style="display:flex;"><span>      <span style="color:#81a1c1;font-weight:bold">let</span> <span style="color:#81a1c1">(</span>b<span style="color:#81a1c1">,</span> logs2<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">=</span> <span style="color:#8fbcbb">Writer</span><span style="color:#eceff4">.</span>run w2
+</span></span><span style="display:flex;"><span>      <span style="color:#81a1c1;font-weight:bold">return</span> Writer <span style="color:#81a1c1">&lt;|</span> <span style="color:#81a1c1;font-weight:bold">fun</span> <span style="color:#81a1c1">()</span> <span style="color:#81a1c1">-&gt;</span> b<span style="color:#81a1c1">,</span> logs1 <span style="color:#81a1c1">@</span> logs2
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1">|</span> Error e <span style="color:#81a1c1">-&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#81a1c1;font-weight:bold">return</span> Writer <span style="color:#81a1c1">&lt;|</span> <span style="color:#81a1c1;font-weight:bold">fun</span> <span style="color:#81a1c1">()</span> <span style="color:#81a1c1">-&gt;</span> Error e<span style="color:#81a1c1">,</span> logs1 <span style="color:#81a1c1">}</span>
+</span></span></code></pre></div><p>This looks very similar to the <code>WriterResult</code> type. The difference is obviously the reference to the <code>async</code> computation expression. This is needed to unwrap in the correct order. We start with unwrapping the <code>Async</code> type using <code>let!</code> to reveal a <code>WriterResult</code>. This then needs to be unwrapped to reveal a <code>Result</code> and some logs. If the <code>Result</code> is <code>Ok</code> we can apply our function and which gives us an <code>AsyncWriterResult</code>. We have to again unwrap with <code>let!</code> to get a <code>WriterResult</code>. We unwrap the <code>WriterResult</code> leaving us just a <code>Result</code> and some more logs. The <code>Result</code> is returned in a new <code>Writer</code> with the concatenated logs using the <code>return</code> statement to wrap in an <code>Async</code>. As before, if the inner <code>Result</code> is an <code>Error</code> case we do not want to apply <code>f</code> and exit early.</p>
 <h2 id="return">Return</h2>
 <p>Before we can examine a use case for this we need to provide an implementation of <code>return</code>. This function is required before we can use a computation expression. Notice again how the order is important in wrapping the value.</p>
-<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">module</span> <span class="nn">Result</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">retn</span> <span class="n">x</span> <span class="o">=</span>
-    <span class="n">Ok</span> <span class="n">x</span>
-
-<span class="k">module</span> <span class="nn">Async</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">retn</span> <span class="n">x</span> <span class="o">=</span> <span class="n">async</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">x</span> <span class="o">}</span>
-
-<span class="k">module</span> <span class="nn">Writer</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">retn</span> <span class="n">x</span> <span class="o">=</span>
-    <span class="n">Writer</span> <span class="o">&lt;|</span> <span class="k">fun</span> <span class="bp">()</span> <span class="o">-&gt;</span> <span class="n">x</span><span class="o">,</span> <span class="bp">[]</span>
-
-<span class="k">module</span> <span class="nn">AsyncWriterResult</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">retn</span> <span class="n">x</span> <span class="o">=</span>
-    <span class="nn">Result</span><span class="p">.</span><span class="n">retn</span> <span class="n">x</span> <span class="o">|&gt;</span> <span class="nn">Writer</span><span class="p">.</span><span class="n">retn</span> <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">retn</span>
-
-<span class="k">module</span> <span class="nn">Builder</span> <span class="o">=</span>
-
-  <span class="k">type</span> <span class="nc">AsyncWriterResultBuilder</span> <span class="bp">()</span> <span class="o">=</span>
-    <span class="k">member</span> <span class="n">__</span><span class="p">.</span><span class="nf">Return</span> <span class="o">(</span><span class="n">x</span><span class="o">)</span> <span class="o">=</span> <span class="nn">AsyncWriterResult</span><span class="p">.</span><span class="n">retn</span> <span class="n">x</span>
-    <span class="k">member</span> <span class="n">__</span><span class="p">.</span><span class="nf">ReturnFrom</span> <span class="o">(</span><span class="n">m</span><span class="o">:</span> <span class="n">Async</span><span class="o">&lt;</span><span class="n">Writer</span><span class="o">&lt;</span><span class="k">&#39;</span><span class="n">a</span><span class="o">,</span> <span class="n">Result</span><span class="o">&lt;</span><span class="k">&#39;</span><span class="n">b</span><span class="o">,</span> <span class="k">&#39;</span><span class="n">c</span><span class="o">&gt;&gt;&gt;)</span> <span class="o">=</span> <span class="n">m</span>
-    <span class="k">member</span> <span class="n">__</span><span class="p">.</span><span class="nf">Bind</span> <span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="n">f</span><span class="o">)</span> <span class="o">=</span> <span class="nn">AsyncWriterResult</span><span class="p">.</span><span class="n">bind</span> <span class="n">f</span> <span class="n">m</span>
-
-  <span class="k">let</span> <span class="nv">asyncWriterResult</span> <span class="o">=</span>
-    <span class="k">new</span> <span class="n">AsyncWriterResultBuilder</span> <span class="bp">()</span>
-</code></pre></div><h3 id="writing">Writing</h3>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fsharp" data-lang="fsharp"><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">Result</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> retn x <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>    Ok x
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">Async</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> retn x <span style="color:#81a1c1">=</span> async <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">return</span> x <span style="color:#81a1c1">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">Writer</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> retn x <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>    Writer <span style="color:#81a1c1">&lt;|</span> <span style="color:#81a1c1;font-weight:bold">fun</span> <span style="color:#81a1c1">()</span> <span style="color:#81a1c1">-&gt;</span> x<span style="color:#81a1c1">,</span> <span style="color:#81a1c1">[]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">AsyncWriterResult</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> retn x <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8fbcbb">Result</span><span style="color:#eceff4">.</span>retn x <span style="color:#81a1c1">|&gt;</span> <span style="color:#8fbcbb">Writer</span><span style="color:#eceff4">.</span>retn <span style="color:#81a1c1">|&gt;</span> <span style="color:#8fbcbb">Async</span><span style="color:#eceff4">.</span>retn
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">Builder</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">type</span> <span style="color:#8fbcbb">AsyncWriterResultBuilder</span> <span style="color:#81a1c1">()</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">member</span> __<span style="color:#eceff4">.</span><span style="color:#88c0d0">Return</span> <span style="color:#81a1c1">(</span>x<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">=</span> <span style="color:#8fbcbb">AsyncWriterResult</span><span style="color:#eceff4">.</span>retn x
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">member</span> __<span style="color:#eceff4">.</span><span style="color:#88c0d0">ReturnFrom</span> <span style="color:#81a1c1">(</span>m<span style="color:#81a1c1">:</span> Async<span style="color:#81a1c1">&lt;</span>Writer<span style="color:#81a1c1">&lt;</span><span style="color:#81a1c1;font-weight:bold">&#39;</span>a<span style="color:#81a1c1">,</span> Result<span style="color:#81a1c1">&lt;</span><span style="color:#81a1c1;font-weight:bold">&#39;</span>b<span style="color:#81a1c1">,</span> <span style="color:#81a1c1;font-weight:bold">&#39;</span>c<span style="color:#81a1c1">&gt;&gt;&gt;)</span> <span style="color:#81a1c1">=</span> m
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">member</span> __<span style="color:#eceff4">.</span><span style="color:#88c0d0">Bind</span> <span style="color:#81a1c1">(</span>m<span style="color:#81a1c1">,</span> f<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">=</span> <span style="color:#8fbcbb">AsyncWriterResult</span><span style="color:#eceff4">.</span>bind f m
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> asyncWriterResult <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">new</span> AsyncWriterResultBuilder <span style="color:#81a1c1">()</span>
+</span></span></code></pre></div><h3 id="writing">Writing</h3>
 <p>Now we have our computation expression defined we need one more thing. A handy write function that lets us write logs when required. Notice again how we are wrapping in the corrrect order. The <code>write</code> function implicitly returns <code>unit</code> type, and will be used with the <code>do!</code> directive.</p>
-<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">module</span> <span class="nn">AsyncWriterResult</span> <span class="o">=</span>
-
-  <span class="k">let</span> <span class="nv">write</span> <span class="n">log</span> <span class="o">=</span> <span class="n">async</span> <span class="o">{</span>
-    <span class="k">return</span> <span class="n">Writer</span> <span class="o">(</span><span class="k">fun</span> <span class="bp">()</span> <span class="o">-&gt;</span> <span class="nn">Result</span><span class="p">.</span><span class="n">retn</span> <span class="bp">()</span><span class="o">,</span> <span class="o">[</span><span class="n">log</span><span class="o">])</span> <span class="o">}</span>
-</code></pre></div><h2 id="in-practice">In Practice</h2>
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fsharp" data-lang="fsharp"><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">module</span> <span style="color:#8fbcbb">AsyncWriterResult</span> <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let</span> write log <span style="color:#81a1c1">=</span> async <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">return</span> Writer <span style="color:#81a1c1">(</span><span style="color:#81a1c1;font-weight:bold">fun</span> <span style="color:#81a1c1">()</span> <span style="color:#81a1c1">-&gt;</span> <span style="color:#8fbcbb">Result</span><span style="color:#eceff4">.</span>retn <span style="color:#81a1c1">()</span><span style="color:#81a1c1">,</span> <span style="color:#81a1c1">[</span>log<span style="color:#81a1c1">])</span> <span style="color:#81a1c1">}</span>
+</span></span></code></pre></div><h2 id="in-practice">In Practice</h2>
 <p>Lets define some bindable functions and compose them in a <code>AsyncWriterResult</code> computation expression.</p>
-<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">let</span> <span class="nv">getThing</span> <span class="n">x</span> <span class="o">=</span> <span class="n">async</span> <span class="o">{</span>
-  <span class="k">do</span><span class="o">!</span> <span class="nn">Async</span><span class="p">.</span><span class="n">Sleep</span> <span class="n">100</span>
-  <span class="k">return</span> <span class="nn">Result</span><span class="p">.</span><span class="n">retn</span> <span class="n">x</span> <span class="o">|&gt;</span> <span class="nn">Writer</span><span class="p">.</span><span class="n">retn</span>  <span class="o">}</span>
-
-<span class="k">let</span> <span class="nv">checkThing</span> <span class="n">r</span> <span class="o">=</span>
-  <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">0</span> <span class="k">then</span> <span class="n">Ok</span> <span class="s">&#34;thing is ok&#34;</span> <span class="k">else</span> <span class="n">Error</span> <span class="s">&#34;thing is bad&#34;</span>
-  <span class="o">|&gt;</span> <span class="nn">Writer</span><span class="p">.</span><span class="n">retn</span> <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">retn</span>
-
-<span class="k">let</span> <span class="nv">expr</span> <span class="n">x</span> <span class="o">=</span> <span class="n">asyncWriterResult</span> <span class="o">{</span>
-  <span class="k">do</span><span class="o">!</span> <span class="n">write</span> <span class="s">&#34;getting thing&#34;</span>
-  <span class="k">let!</span> <span class="nv">thing</span> <span class="o">=</span> <span class="n">getThing</span> <span class="n">x</span>
-  <span class="k">do</span><span class="o">!</span> <span class="n">write</span> <span class="s">&#34;checking thing&#34;</span>
-  <span class="k">let!</span> <span class="nv">result</span> <span class="o">=</span> <span class="n">checkThing</span> <span class="n">thing</span>
-  <span class="k">do</span><span class="o">!</span> <span class="n">write</span> <span class="s">&#34;returning thing&#34;</span>
-  <span class="k">return</span> <span class="n">result</span> <span class="o">}</span>
-
-<span class="k">let</span> <span class="nv">eval</span> <span class="n">x</span> <span class="o">=</span>
-  <span class="n">expr</span> <span class="n">0</span>
-  <span class="o">|&gt;</span> <span class="nn">Async</span><span class="p">.</span><span class="n">RunSynchronously</span>
-  <span class="o">|&gt;</span> <span class="nn">Writer</span><span class="p">.</span><span class="n">run</span>
-</code></pre></div><p>Notice the difference in output for each call below. The logs accumulate only as far the <code>Result</code> remains <code>Ok</code>. This shows we have preserved the meaning of the <code>Result</code> type while successfully adding <code>Writer</code> and <code>Async</code> layers.</p>
-<pre><code>&gt; eval 0;;
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fsharp" data-lang="fsharp"><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">let</span> getThing x <span style="color:#81a1c1">=</span> async <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">do</span><span style="color:#81a1c1">!</span> <span style="color:#8fbcbb">Async</span><span style="color:#eceff4">.</span>Sleep 100
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">return</span> <span style="color:#8fbcbb">Result</span><span style="color:#eceff4">.</span>retn x <span style="color:#81a1c1">|&gt;</span> <span style="color:#8fbcbb">Writer</span><span style="color:#eceff4">.</span>retn  <span style="color:#81a1c1">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">let</span> checkThing r <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">if</span> r <span style="color:#81a1c1">&gt;</span> 0 <span style="color:#81a1c1;font-weight:bold">then</span> Ok <span style="color:#a3be8c">&#34;thing is ok&#34;</span> <span style="color:#81a1c1;font-weight:bold">else</span> Error <span style="color:#a3be8c">&#34;thing is bad&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1">|&gt;</span> <span style="color:#8fbcbb">Writer</span><span style="color:#eceff4">.</span>retn <span style="color:#81a1c1">|&gt;</span> <span style="color:#8fbcbb">Async</span><span style="color:#eceff4">.</span>retn
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">let</span> expr x <span style="color:#81a1c1">=</span> asyncWriterResult <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">do</span><span style="color:#81a1c1">!</span> write <span style="color:#a3be8c">&#34;getting thing&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let!</span> thing <span style="color:#81a1c1">=</span> getThing x
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">do</span><span style="color:#81a1c1">!</span> write <span style="color:#a3be8c">&#34;checking thing&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let!</span> result <span style="color:#81a1c1">=</span> checkThing thing
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">do</span><span style="color:#81a1c1">!</span> write <span style="color:#a3be8c">&#34;returning thing&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">return</span> result <span style="color:#81a1c1">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">let</span> eval x <span style="color:#81a1c1">=</span>
+</span></span><span style="display:flex;"><span>  expr 0
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1">|&gt;</span> <span style="color:#8fbcbb">Async</span><span style="color:#eceff4">.</span>RunSynchronously
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1">|&gt;</span> <span style="color:#8fbcbb">Writer</span><span style="color:#eceff4">.</span>run
+</span></span></code></pre></div><p>Notice the difference in output for each call below. The logs accumulate only as far the <code>Result</code> remains <code>Ok</code>. This shows we have preserved the meaning of the <code>Result</code> type while successfully adding <code>Writer</code> and <code>Async</code> layers.</p>
+<pre tabindex="0"><code>&gt; eval 0;;
 val it : Result&lt;string,string&gt; * string list =
-  (Error &quot;thing is bad&quot;, [&quot;getting thing&quot;; &quot;checking thing&quot;])
+  (Error &#34;thing is bad&#34;, [&#34;getting thing&#34;; &#34;checking thing&#34;])
 
 &gt; eval 1;;
 val it : Result&lt;string,string&gt; * string list =
-  (Ok &quot;thing is ok&quot;, [&quot;getting thing&quot;; &quot;checking thing&quot;; &quot;returning thing&quot;])
+  (Ok &#34;thing is ok&#34;, [&#34;getting thing&#34;; &#34;checking thing&#34;; &#34;returning thing&#34;])
 </code></pre><h2 id="discussion">Discussion</h2>
-<p>The <code>WriterResult</code> and <code>AsyncWriterResult</code> types implicitly return on the <a href="https://fsharpforfunandprofit.com/posts/recipe-part2/">error track</a> when an <code>Error</code> case is encountered meaning any <code>do!</code> log will not be evaluated after any <code>let!</code> that returns an <code>Error</code>. As demonstrated above. But what if you <em>do</em> want to log after receiving an <code>Error</code>?</p>
+<p>The <code>WriterResult</code> and <code>AsyncWriterResult</code> types implicitly return on the <a href="https://fsharpforfunandprofit.com/posts/recipe-part2/"target="_blank" rel="noopener noreferrer">error track</a> when an <code>Error</code> case is encountered meaning any <code>do!</code> log will not be evaluated after any <code>let!</code> that returns an <code>Error</code>. As demonstrated above. But what if you <em>do</em> want to log after receiving an <code>Error</code>?</p>
 <p>Lets say we want to log the duration of a function call that returns a <code>AsyncWriterResult</code>. We can only know the elapsed time after the function has completed. However, if the function results in an <code>Error</code> we don&rsquo;t have the opportunity to stop the clock or write the log!</p>
 <p>The <code>measure</code> function below can help us out. By unwrapping the outer <code>Async</code> type by invoking the function with a <code>unit</code> we have a <code>WriterResult</code>. We run this to get at our inner <code>Result</code> and any logs written. We don&rsquo;t care which case our <code>Result</code> is because we want to write the elapsed time in either case. We can just bundle up our <code>Result</code> with the concatenated logs in a new <code>Writer</code> and using <code>return!</code> because we have a fully formed <code>AsyncWriterResult</code> already at the end of the expression.</p>
-<div class="highlight"><pre class="chroma"><code class="language-fsharp" data-lang="fsharp"><span class="k">let</span> <span class="nv">measure</span> <span class="n">name</span> <span class="n">f</span> <span class="o">=</span> <span class="n">asyncWriterResult</span> <span class="o">{</span>
-  <span class="k">return</span><span class="o">!</span> <span class="n">async</span> <span class="o">{</span>
-    <span class="k">let</span> <span class="nv">sw</span> <span class="o">=</span> <span class="nn">Stopwatch</span><span class="p">.</span><span class="n">StartNew</span> <span class="bp">()</span>
-    <span class="k">let!</span> <span class="nv">w</span> <span class="o">=</span> <span class="n">f</span> <span class="bp">()</span>
-    <span class="k">let</span> <span class="o">(</span><span class="n">r</span><span class="o">,</span> <span class="n">logs</span><span class="o">)</span> <span class="o">=</span> <span class="nn">Writer</span><span class="p">.</span><span class="n">run</span> <span class="n">w</span>
-    <span class="k">let</span> <span class="nv">log</span> <span class="o">=</span> <span class="n">sprintf</span> <span class="s">&#34;%s: %i&#34;</span> <span class="n">name</span> <span class="n">sw</span><span class="o">.</span><span class="n">ElapsedMilliseconds</span>
-    <span class="k">return</span> <span class="n">Writer</span> <span class="o">&lt;|</span> <span class="k">fun</span> <span class="bp">()</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">,</span> <span class="n">log</span> <span class="o">::</span> <span class="n">logs</span> <span class="o">}</span> <span class="o">}</span>
-
-<span class="k">let</span> <span class="nv">failToGetThing</span> <span class="n">x</span> <span class="o">=</span> <span class="n">async</span> <span class="o">{</span>
-  <span class="k">do</span><span class="o">!</span> <span class="nn">Async</span><span class="p">.</span><span class="n">Sleep</span> <span class="n">100</span>
-  <span class="k">return</span> <span class="n">Error</span> <span class="s">&#34;could not get thing&#34;</span> <span class="o">|&gt;</span> <span class="nn">Writer</span><span class="p">.</span><span class="n">retn</span>  <span class="o">}</span>
-
-<span class="k">let</span> <span class="nv">expr</span> <span class="n">x</span> <span class="o">=</span> <span class="n">asyncWriterResult</span> <span class="o">{</span>
-  <span class="k">do</span><span class="o">!</span> <span class="n">write</span> <span class="s">&#34;getting thing&#34;</span>
-  <span class="k">let!</span> <span class="nv">thing</span> <span class="o">=</span> <span class="n">measure</span> <span class="s">&#34;elapsed&#34;</span> <span class="o">&lt;|</span> <span class="k">fun</span> <span class="bp">()</span> <span class="o">-&gt;</span> <span class="n">failToGetThing</span> <span class="n">x</span>
-  <span class="k">do</span><span class="o">!</span> <span class="n">write</span> <span class="s">&#34;returning thing&#34;</span>
-  <span class="k">return</span> <span class="n">thing</span> <span class="o">}</span>
-</code></pre></div><p>Now the output includes the <code>elapsed</code> log despite resulting in an <code>Error</code>.</p>
-<pre><code>&gt; eval 1;;
+<div class="highlight"><pre tabindex="0" style="color:#d8dee9;background-color:#2e3440;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fsharp" data-lang="fsharp"><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">let</span> measure name f <span style="color:#81a1c1">=</span> asyncWriterResult <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">return</span><span style="color:#81a1c1">!</span> async <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">let</span> sw <span style="color:#81a1c1">=</span> <span style="color:#8fbcbb">Stopwatch</span><span style="color:#eceff4">.</span>StartNew <span style="color:#81a1c1">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">let!</span> w <span style="color:#81a1c1">=</span> f <span style="color:#81a1c1">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">let</span> <span style="color:#81a1c1">(</span>r<span style="color:#81a1c1">,</span> logs<span style="color:#81a1c1">)</span> <span style="color:#81a1c1">=</span> <span style="color:#8fbcbb">Writer</span><span style="color:#eceff4">.</span>run w
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">let</span> log <span style="color:#81a1c1">=</span> sprintf <span style="color:#a3be8c">&#34;%s: %i&#34;</span> name sw<span style="color:#81a1c1">.</span>ElapsedMilliseconds
+</span></span><span style="display:flex;"><span>    <span style="color:#81a1c1;font-weight:bold">return</span> Writer <span style="color:#81a1c1">&lt;|</span> <span style="color:#81a1c1;font-weight:bold">fun</span> <span style="color:#81a1c1">()</span> <span style="color:#81a1c1">-&gt;</span> r<span style="color:#81a1c1">,</span> log <span style="color:#81a1c1">::</span> logs <span style="color:#81a1c1">}</span> <span style="color:#81a1c1">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">let</span> failToGetThing x <span style="color:#81a1c1">=</span> async <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">do</span><span style="color:#81a1c1">!</span> <span style="color:#8fbcbb">Async</span><span style="color:#eceff4">.</span>Sleep 100
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">return</span> Error <span style="color:#a3be8c">&#34;could not get thing&#34;</span> <span style="color:#81a1c1">|&gt;</span> <span style="color:#8fbcbb">Writer</span><span style="color:#eceff4">.</span>retn  <span style="color:#81a1c1">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#81a1c1;font-weight:bold">let</span> expr x <span style="color:#81a1c1">=</span> asyncWriterResult <span style="color:#81a1c1">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">do</span><span style="color:#81a1c1">!</span> write <span style="color:#a3be8c">&#34;getting thing&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">let!</span> thing <span style="color:#81a1c1">=</span> measure <span style="color:#a3be8c">&#34;elapsed&#34;</span> <span style="color:#81a1c1">&lt;|</span> <span style="color:#81a1c1;font-weight:bold">fun</span> <span style="color:#81a1c1">()</span> <span style="color:#81a1c1">-&gt;</span> failToGetThing x
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">do</span><span style="color:#81a1c1">!</span> write <span style="color:#a3be8c">&#34;returning thing&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#81a1c1;font-weight:bold">return</span> thing <span style="color:#81a1c1">}</span>
+</span></span></code></pre></div><p>Now the output includes the <code>elapsed</code> log despite resulting in an <code>Error</code>.</p>
+<pre tabindex="0"><code>&gt; eval 1;;
 val it : Result&lt;string,string&gt; * string list =
-  (Error &quot;could not get thing&quot;, [&quot;getting thing&quot;; &quot;elapsed: 105&quot;])
-</code></pre>
-</article>
-<nav class="no-print post-nav">
-
-	<a class="prev-post" href="https://blair55.github.io/blog/serverless-package-done-right/">
-		<img class="icon-text" src="/img/prev.svg"/>Serverless package done right</a>
-
-
-	<a class="next-post" href="https://blair55.github.io/blog/dynamodb-functional-wrapper/">A functional wrapper around the .net AWS DynamoDB SDK<img class="icon-text" src="/img/next.svg"/>
-	</a>
-
-</nav>
-
-
-<section id="related">
-  <h4>See Also</h4>
-  <ul>
-    
-  	<li><a href="/blog/aws-parameter-store-scripting/">Scripting with AWS Parameter Store</a></li>
-  	
-  </ul>
+  (Error &#34;could not get thing&#34;, [&#34;getting thing&#34;; &#34;elapsed: 105&#34;])
+</code></pre></article><section class="article labels"><a class="tag" href=/tags/fsharp/>fsharp</a><a class="tag" href=/tags/functional/>functional</a><a class="tag" href=/tags/monads/>monads</a></section><section class="article author"><img alt="" loading="lazy" class="avatar" src="/img/avatar.jpg"/><div class="details"><a class="item" href="https://github.com/blair55" target="_blank" rel="noopener noreferrer"><span class="iconfont icon-github"></span>&nbsp;blair55</a><a class="item" href="https://bsky.app/profile/nickblair.dev" target="_blank" rel="noopener noreferrer"><span class="iconfont"><img style="width: 1em; margin-bottom: -2px;" src="/img/bluesky.svg" alt="Bluesky"/></span>&nbsp;@nickblair.dev</a></div>
 </section>
+</div>
+<div class="article bottom"><section class="article navigation"><p><a class="link" href="/blog/dynamodb-functional-wrapper/"><span class="iconfont icon-article"></span>A functional wrapper around the .net AWS DynamoDB SDK</a></p><p><a class="link" href="/blog/serverless-package-done-right/"><span class="iconfont icon-article"></span>Serverless package done right</a></p></section></div></section><section id="footer"><div class="footer-wrap">
+    <p class="copyright">Tech Nick</p>
+    <p class="powerby"><span>Powered&nbsp;by&nbsp;</span><a href="https://gohugo.io" 
+        target="_blank" rel="noopener noreferrer">Hugo</a><span>&nbsp;&amp;&nbsp;</span><a href="https://themes.gohugo.io/hugo-notepadium/" 
+        target="_blank" rel="noopener noreferrer">Notepadium</a></p></div></section></body>
 
-
-
-			<hr class="sep" />
-		</main>
-		<footer class="container no-print">
-			<div class="u-footer">
-				
-
-<a href="https://github.com/blair55"><img class="icon-social" src="/img/github.svg" alt="Github"/></a>
-
-
-<a href="https://twitter.com/nickblair"><img class="icon-social" src="/img/twitter.svg" alt="Twitter"/></a>
-
-				<p>
-					
-					
-					
-				</p>
-				
-				<a href="#brand">
-					<img class="icon-text" src="/img/toup.svg" alt="To Up"/>
-					<span>Back to Up</span>
-				</a>
-				
-			</div>
-		</footer>
-		
-	</body>
 </html>
-
